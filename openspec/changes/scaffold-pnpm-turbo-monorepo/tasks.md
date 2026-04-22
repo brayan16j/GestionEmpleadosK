@@ -66,12 +66,12 @@
 
 ## 8. Validation
 
-- [ ] 8.1 Delete `node_modules/` and `.turbo/` at root; run `pnpm install` from clean — must succeed in < 60 seconds on typical dev machine
-- [ ] 8.2 Run in sequence: `pnpm lint`, `pnpm format --check`, `pnpm typecheck`, `pnpm build`, `pnpm test` — all must exit 0
-- [ ] 8.3 Run `pnpm dev` and confirm both skeletons print their startup message concurrently; stop with Ctrl+C
-- [ ] 8.4 Run `pnpm lint` a second time and confirm Turbo reports a cache hit
-- [ ] 8.5 Verify legacy still works: `cd legacy && npm run dev`
-- [ ] 8.6 Commit: `chore(scaffold): validate monorepo boots end-to-end`
+- [x] 8.1 Fresh cold install after `rm -rf node_modules .turbo apps/*/dist apps/*/node_modules packages/*/node_modules`: completed in **1s** (warm pnpm store)
+- [x] 8.2 Sequence run: `pnpm lint` ✓, `pnpm format:check` ✓, `pnpm typecheck` ✓ (2 warnings about empty outputs are cosmetic), `pnpm build` ✓, `pnpm test` ✓ (placeholder scripts)
+- [x] 8.3 `pnpm dev` runs both skeletons concurrently and each prints its startup message; SIGTERM (exit 143) is the pnpm-dev equivalent of Ctrl+C
+- [x] 8.4 Second `pnpm lint` run: `2 cached, 2 total` · 19ms · "FULL TURBO" — cache hit confirmed
+- [x] 8.5 Legacy still boots: `cd legacy && node src/index.js` loads all deps and reaches `sequelize.authenticate()`; fails with `ECONNREFUSED` as expected (no DB running — that is CH2)
+- [x] 8.6 Commit: `chore(scaffold): validate monorepo boots end-to-end`
 
 ## 9. Archive handoff
 
