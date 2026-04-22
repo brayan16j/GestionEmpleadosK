@@ -27,14 +27,14 @@
 
 ## 4. App skeletons
 
-- [ ] 4.1 Create `apps/api/package.json` with name `@employeek/api`, scripts: `dev` (tsx watch), `build` (tsc --build), `typecheck` (tsc --noEmit), `lint`, `test` (placeholder: `echo "no tests yet" && exit 0`)
-- [ ] 4.2 Create `apps/api/tsconfig.json` extending `@employeek/tsconfig/node.json`
-- [ ] 4.3 Create `apps/api/src/index.ts` with a minimal startup log (`console.log('api skeleton up')`)
-- [ ] 4.4 Create `apps/web/package.json` with name `@employeek/web`, scripts identical shape (no Vite yet)
-- [ ] 4.5 Create `apps/web/tsconfig.json` extending `@employeek/tsconfig/base.json`
-- [ ] 4.6 Create `apps/web/src/index.ts` with a minimal startup log (`console.log('web skeleton up')`)
-- [ ] 4.7 Run `pnpm install && pnpm build` at root; both skeletons must produce `dist/`
-- [ ] 4.8 Commit: `chore(scaffold): add apps/api and apps/web typescript skeletons`
+- [x] 4.1 Create `apps/api/package.json` with name `@employeek/api`, scripts: `dev` (tsx watch), `build` (tsc --build), `typecheck` (tsc --noEmit), `lint`, `test` (placeholder: `echo "no tests yet" && exit 0`)
+- [x] 4.2 Create `apps/api/tsconfig.json` extending `@employeek/tsconfig/node.json`
+- [x] 4.3 Create `apps/api/src/index.ts` with a minimal startup log (`console.log('api skeleton up')`)
+- [x] 4.4 Create `apps/web/package.json` with name `@employeek/web`, scripts identical shape (no Vite yet)
+- [x] 4.5 Create `apps/web/tsconfig.json` extending `@employeek/tsconfig/react.json` (updated from `base.json`: the web app targets the browser and needs DOM lib types for the startup log; changing now keeps the next change — rebuild-web-vite-tanstack-query — on solid ground)
+- [x] 4.6 Create `apps/web/src/index.ts` with a minimal startup log. Note: `name` is a DOM global, so the local variable is named `appName` to avoid TS2451 redeclaration errors under the React preset.
+- [x] 4.7 Run `pnpm install && pnpm build` at root; both skeletons must produce `dist/`
+- [x] 4.8 Commit: `chore(scaffold): add apps/api and apps/web typescript skeletons`
 
 ## 5. Shared packages
 

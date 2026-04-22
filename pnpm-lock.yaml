@@ -30,6 +30,20 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  apps/api:
+    devDependencies:
+      '@employeek/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+
+  apps/web:
+    devDependencies:
+      '@employeek/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+
+  packages/tsconfig: {}
+
 packages:
 
   '@esbuild/aix-ppc64@0.27.7':

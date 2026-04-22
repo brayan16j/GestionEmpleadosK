@@ -1,0 +1,19 @@
+{
+  "name": "@employeek/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"(lint wired in group 5)\" && exit 0",
+    "test": "echo \"(no tests yet)\" && exit 0",
+    "clean": "rimraf dist .turbo .tsbuildinfo"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@employeek/tsconfig": "workspace:*"
+  }
+}
