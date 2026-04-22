@@ -1,10 +1,10 @@
 ## 1. Pre-flight and quarantine
 
-- [ ] 1.1 Ensure working tree is clean (`git status` empty) and create branch `feat/scaffold-monorepo`
-- [ ] 1.2 Create top-level `legacy/` directory
-- [ ] 1.3 Move `src/`, `models/`, `config/`, `package.json`, `package-lock.json`, `sonar-project.properties` into `legacy/` (delete `node_modules/` at root; will be re-created under `legacy/` on demand)
-- [ ] 1.4 Verify legacy still works: `cd legacy && npm install && npm run dev` starts server on port 4000; stop server
-- [ ] 1.5 Commit: `chore(scaffold): quarantine legacy express app under /legacy`
+- [x] 1.1 Ensure working tree is clean (`git status` empty) and create branch `feat/scaffold-monorepo`
+- [x] 1.2 Create top-level `legacy/` directory
+- [x] 1.3 Move `src/`, `models/`, `config/`, `package.json`, `package-lock.json`, `sonar-project.properties` into `legacy/` (delete `node_modules/` at root; will be re-created under `legacy/` on demand)
+- [x] 1.4 Verify legacy still works: `cd legacy && npm install && npm run dev` starts server on port 4000; stop server
+- [x] 1.5 Commit: `chore(scaffold): quarantine legacy express app under /legacy`
 
 ## 2. Workspace foundation
 
