@@ -47,15 +47,15 @@
 
 ## 6. Git hooks and commit conventions
 
-- [ ] 6.1 Install devDeps at root: `husky`, `lint-staged`, `@commitlint/cli`, `@commitlint/config-conventional`
-- [ ] 6.2 Add root `package.json` script `prepare: "husky"` and run `pnpm prepare` once
-- [ ] 6.3 Create `.husky/pre-commit` running `pnpm lint-staged`
-- [ ] 6.4 Create `.husky/commit-msg` running `pnpm commitlint --edit $1`
-- [ ] 6.5 Create `.husky/pre-push` running `pnpm typecheck`
-- [ ] 6.6 Create `commitlint.config.js` extending `@commitlint/config-conventional`
-- [ ] 6.7 Add `lint-staged` config in root `package.json` (ESLint on `*.{ts,tsx}`, Prettier on rest)
-- [ ] 6.8 Test: attempt a commit with a bad message and confirm it is rejected; then commit with a valid message
-- [ ] 6.9 Commit: `chore(scaffold): enforce conventional commits and pre-commit quality gates`
+- [x] 6.1 Install devDeps at root: `husky`, `lint-staged`, `@commitlint/cli`, `@commitlint/config-conventional`
+- [x] 6.2 Add root `package.json` script `prepare: "husky"` and run `pnpm prepare` once
+- [x] 6.3 Create `.husky/pre-commit` running `pnpm lint-staged`
+- [x] 6.4 Create `.husky/commit-msg` running `pnpm commitlint --edit $1`
+- [x] 6.5 Create `.husky/pre-push` running `pnpm typecheck`
+- [x] 6.6 Create `commitlint.config.js` extending `@commitlint/config-conventional`
+- [x] 6.7 Add `lint-staged` config in root `package.json` (ESLint+Prettier on code, Prettier on data files)
+- [x] 6.8 Test: attempted commit with message "test" — rejected by commitlint (subject-empty, type-empty); valid message accepted below
+- [x] 6.9 Commit: `chore(scaffold): enforce conventional commits and pre-commit quality gates`
 
 ## 7. Developer documentation
 
