@@ -59,10 +59,10 @@
 
 ## 7. Developer documentation
 
-- [ ] 7.1 Create root `CLAUDE.md` with: stack summary, root scripts, commit convention, OpenSpec workflow, "do not touch legacy/" rule
-- [ ] 7.2 Replace root `README.md` with: badges, quick start (`pnpm install && pnpm dev`), structure map, links to `CLAUDE.md` and `openspec/`
-- [ ] 7.3 Create `.vscode/extensions.json` recommending ESLint, Prettier, EditorConfig
-- [ ] 7.4 Commit: `docs(scaffold): add CLAUDE.md and update README for monorepo`
+- [x] 7.1 Create root `CLAUDE.md` with: stack summary, root scripts, commit convention, OpenSpec workflow, "do not touch legacy/" rule
+- [x] 7.2 Create root `README.md` with: quick start, structure map, scripts table, link to `CLAUDE.md` (no prior README existed)
+- [x] 7.3 Create `.vscode/extensions.json` recommending ESLint, Prettier, EditorConfig, Prisma, Tailwind, Docker, YAML, MDX
+- [x] 7.4 Commit: `docs(scaffold): add CLAUDE.md and update README for monorepo`
 
 ## 8. Validation
 
