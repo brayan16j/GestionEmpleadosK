@@ -1,0 +1,22 @@
+{
+  "name": "@employeek/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "description": "Shared ESLint flat configuration for EmployeeK monorepo.",
+  "dependencies": {
+    "typescript-eslint": "^8.22.0",
+    "eslint-config-prettier": "^9.1.0"
+  },
+  "peerDependencies": {
+    "eslint": ">=9.0.0",
+    "typescript": ">=5.0.0"
+  }
+}

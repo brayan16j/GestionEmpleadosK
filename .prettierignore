@@ -1,0 +1,14 @@
+node_modules/
+**/node_modules/
+**/dist/
+**/.turbo/
+legacy/
+pnpm-lock.yaml
+package-lock.json
+*.tsbuildinfo
+coverage/
+apps/**/dist/
+
+# Tool-managed directories (OpenSpec CLI + Claude Code skills own the formatting)
+.claude/
+openspec/

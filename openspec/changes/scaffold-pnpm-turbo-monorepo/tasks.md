@@ -38,12 +38,12 @@
 
 ## 5. Shared packages
 
-- [ ] 5.1 Create `packages/eslint-config/` with `package.json` (`@employeek/eslint-config`) exposing a flat config object with TypeScript + import rules + Prettier compatibility
-- [ ] 5.2 Install peer/dev deps in `packages/eslint-config`: `@typescript-eslint/eslint-plugin`, `@typescript-eslint/parser`, `eslint-config-prettier`, `eslint-plugin-import`
-- [ ] 5.3 Create root `eslint.config.js` that imports `@employeek/eslint-config` and applies it to all workspaces
-- [ ] 5.4 Create root `.prettierrc` and `.prettierignore`
-- [ ] 5.5 Run `pnpm lint` and `pnpm format --check`; both must pass
-- [ ] 5.6 Commit: `chore(scaffold): add shared eslint and prettier configuration`
+- [x] 5.1 Create `packages/eslint-config/` with `package.json` (`@employeek/eslint-config`) exposing a flat config object with TypeScript + Prettier compatibility
+- [x] 5.2 Install deps in `packages/eslint-config`: `typescript-eslint` (unified v8 entry for flat config), `eslint-config-prettier`. Dropped `eslint-plugin-import` — unused and incompatible with ESLint 10 peer range.
+- [x] 5.3 Create root `eslint.config.js` that imports `@employeek/eslint-config` and applies it to all workspaces, with ignores for `legacy/`, `openspec/`, `dist/`, `.turbo/`, `.husky/` and declaration files
+- [x] 5.4 Create root `.prettierrc` and `.prettierignore` (includes `.claude/` and `openspec/` — managed by external tools)
+- [x] 5.5 Run `pnpm lint` and `pnpm format:check`; both pass
+- [x] 5.6 Commit: `chore(scaffold): add shared eslint and prettier configuration`
 
 ## 6. Git hooks and commit conventions
 

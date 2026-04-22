@@ -8,12 +8,14 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc --build",
     "typecheck": "tsc --noEmit",
-    "lint": "echo \"(lint wired in group 5)\" && exit 0",
+    "lint": "eslint src",
     "test": "echo \"(no tests yet)\" && exit 0",
     "clean": "rimraf dist .turbo .tsbuildinfo"
   },
   "dependencies": {},
   "devDependencies": {
-    "@employeek/tsconfig": "workspace:*"
+    "@employeek/eslint-config": "workspace:*",
+    "@employeek/tsconfig": "workspace:*",
+    "eslint": "^10.2.1"
   }
 }
