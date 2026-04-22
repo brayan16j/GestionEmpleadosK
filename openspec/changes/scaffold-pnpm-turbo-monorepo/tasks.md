@@ -20,10 +20,10 @@
 
 ## 3. TypeScript baseline
 
-- [ ] 3.1 Create `tsconfig.base.json` at root with `strict: true`, `noUncheckedIndexedAccess: true`, `target: ES2022`, `module: NodeNext`, `moduleResolution: NodeNext`, `esModuleInterop: true`, `skipLibCheck: true`, `forceConsistentCasingInFileNames: true`
-- [ ] 3.2 Create `packages/tsconfig/` with `package.json` (`@employeek/tsconfig`) and presets: `base.json`, `node.json`, `react.json`
-- [ ] 3.3 Verify `tsc --build --dry` at root completes without errors (no projects yet, acceptable)
-- [ ] 3.4 Commit: `chore(scaffold): add shared typescript configuration`
+- [x] 3.1 Create `tsconfig.base.json` at root with `strict: true`, `noUncheckedIndexedAccess: true`, `target: ES2022`, `module: NodeNext`, `moduleResolution: NodeNext`, `esModuleInterop: true`, `skipLibCheck: true`, `forceConsistentCasingInFileNames: true`
+- [x] 3.2 Create `packages/tsconfig/` with `package.json` (`@employeek/tsconfig`) and presets: `base.json`, `node.json`, `react.json`
+- [x] 3.3 Verify `tsc --version` works (6.0.3 confirmed). Root `tsconfig.json` with references is deferred to Group 4 once `apps/*` exist; `tsc --build --dry` will be re-run at task 4.7.
+- [x] 3.4 Commit: `chore(scaffold): add shared typescript configuration`
 
 ## 4. App skeletons
 
