@@ -75,6 +75,6 @@
 
 ## 9. Archive handoff
 
-- [ ] 9.1 Run `openspec status --change scaffold-pnpm-turbo-monorepo --json` and confirm all artifacts are `done`
-- [ ] 9.2 Run `/opsx:archive` to move the `monorepo-foundation` spec into `openspec/specs/`
-- [ ] 9.3 Merge branch `feat/scaffold-monorepo` into `main`
+- [x] 9.1 Verified via `openspec status --change scaffold-pnpm-turbo-monorepo --json`: all 4 artifacts `done`, `isComplete: true`
+- [ ] 9.2 Run `/opsx:archive` to move the `monorepo-foundation` spec into `openspec/specs/` (user-triggered — separate slash command)
+- [ ] 9.3 Merge branch `feat/scaffold-monorepo` into `main` (user-authorized — shared-state action, pausing per safety protocol)
