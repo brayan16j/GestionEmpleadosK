@@ -8,15 +8,15 @@
 
 ## 2. Workspace foundation
 
-- [ ] 2.1 Create root `package.json` with name `@employeek/root`, `"private": true`, `engines.node >=20.18.0 <21`, `packageManager: "pnpm@9.x"`
-- [ ] 2.2 Create `pnpm-workspace.yaml` declaring `apps/*` and `packages/*`
-- [ ] 2.3 Create `turbo.json` with pipelines for `build`, `lint`, `typecheck`, `test`, `dev` (dev as persistent, others cached)
-- [ ] 2.4 Create `.nvmrc` with `20.18.0`
-- [ ] 2.5 Update root `.gitignore` (add `.turbo/`, `dist/`, `.env*` except `.env.example`, `*.tsbuildinfo`)
-- [ ] 2.6 Create `.gitattributes` with `* text=auto eol=lf` and binary rules
-- [ ] 2.7 Create `.editorconfig` (2 spaces, LF, UTF-8, trim trailing whitespace, final newline)
-- [ ] 2.8 Install base devDependencies at root: `typescript`, `turbo`, `prettier`, `eslint`, `@types/node`, `tsx`
-- [ ] 2.9 Commit: `chore(scaffold): initialize pnpm workspace with turborepo`
+- [x] 2.1 Create root `package.json` with name `@employeek/root`, `"private": true`, `engines.node >=20.18.0 <21`, `packageManager: "pnpm@9.x"`
+- [x] 2.2 Create `pnpm-workspace.yaml` declaring `apps/*` and `packages/*`
+- [x] 2.3 Create `turbo.json` with pipelines for `build`, `lint`, `typecheck`, `test`, `dev` (dev as persistent, others cached)
+- [x] 2.4 Create `.nvmrc` with `20.18.0`
+- [x] 2.5 Update root `.gitignore` (add `.turbo/`, `dist/`, `.env*` except `.env.example`, `*.tsbuildinfo`)
+- [x] 2.6 Create `.gitattributes` with `* text=auto eol=lf` and binary rules
+- [x] 2.7 Create `.editorconfig` (2 spaces, LF, UTF-8, trim trailing whitespace, final newline)
+- [x] 2.8 Install base devDependencies at root: `typescript`, `turbo`, `prettier`, `eslint`, `@types/node`, `tsx`
+- [x] 2.9 Commit: `chore(scaffold): initialize pnpm workspace with turborepo`
 
 ## 3. TypeScript baseline
 
