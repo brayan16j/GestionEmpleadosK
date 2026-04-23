@@ -42,20 +42,25 @@ pnpm dev         # start all apps
 
 ## Root scripts (always run from the repo root)
 
-| Command             | What it does                                         |
-| ------------------- | ---------------------------------------------------- |
-| `pnpm dev`          | Turbo runs `dev` in every app (persistent, streamed) |
-| `pnpm build`        | Turbo runs `build` (cached by inputs)                |
-| `pnpm lint`         | ESLint on every workspace                            |
-| `pnpm typecheck`    | TypeScript on every workspace                        |
-| `pnpm test`         | Vitest in every workspace (placeholder for now)      |
-| `pnpm format`       | Prettier --write on the whole repo                   |
-| `pnpm format:check` | Prettier --check (used in CI)                        |
-| `pnpm clean`        | Remove `dist/`, `.turbo/`, `node_modules/`           |
-| `pnpm db:up`        | Start the local Postgres 16 container (detached)     |
-| `pnpm db:down`      | Stop the local Postgres container (volume preserved) |
-| `pnpm db:logs`      | Tail Postgres logs (Ctrl+C to stop, container stays) |
-| `pnpm db:reset`     | **Destructive** — wipe the DB volume and restart     |
+| Command                  | What it does                                         |
+| ------------------------ | ---------------------------------------------------- |
+| `pnpm dev`               | Turbo runs `dev` in every app (persistent, streamed) |
+| `pnpm build`             | Turbo runs `build` (cached by inputs)                |
+| `pnpm lint`              | ESLint on every workspace                            |
+| `pnpm typecheck`         | TypeScript on every workspace                        |
+| `pnpm test`              | Vitest in every workspace (placeholder for now)      |
+| `pnpm format`            | Prettier --write on the whole repo                   |
+| `pnpm format:check`      | Prettier --check (used in CI)                        |
+| `pnpm clean`             | Remove `dist/`, `.turbo/`, `node_modules/`           |
+| `pnpm db:up`             | Start the local Postgres 16 container (detached)     |
+| `pnpm db:down`           | Stop the local Postgres container (volume preserved) |
+| `pnpm db:logs`           | Tail Postgres logs (Ctrl+C to stop, container stays) |
+| `pnpm db:reset`          | **Destructive** — wipe the DB volume and restart     |
+| `pnpm db:migrate`        | Create/apply a dev migration (`prisma migrate dev`)  |
+| `pnpm db:migrate:deploy` | Apply pending migrations (CI/prod-safe)              |
+| `pnpm db:generate`       | Regenerate the Prisma Client from `schema.prisma`    |
+| `pnpm db:seed`           | Run the seed script (idempotent; populates `estado`) |
+| `pnpm db:studio`         | Open Prisma Studio (browser-based DB explorer)       |
 
 Turbo caches all non-`dev` tasks. A second run of the same task is a cache hit and completes in under 2 seconds.
 
@@ -76,7 +81,14 @@ Data persists between `db:down` and `db:up` in a named volume (`employeek_pgdata
 
 If host port `5432` is already taken, set `POSTGRES_PORT=5433` in your `.env` and re-run `pnpm db:up`.
 
-Schema and migrations are **not** managed here — those land with Prisma in the `migrate-sequelize-to-prisma` change (CH3). Right now the DB is empty by design.
+### Schema & migrations
+
+Prisma 7 owns the schema. The source of truth is `apps/api/prisma/schema.prisma`; the datasource URL comes from `apps/api/prisma.config.ts`, which loads the repo-root `.env` via `process.loadEnvFile()`.
+
+- **Edit the schema** at `apps/api/prisma/schema.prisma`, then run `pnpm db:migrate` — Prisma will prompt for a migration name and apply it against the local DB.
+- **Seed data** is in `apps/api/prisma/seed.ts` (idempotent upsert of the `estado` catalogue). Run `pnpm db:seed` any time after a migration.
+- **Fresh start:** `pnpm db:reset` drops the volume. You must re-run `pnpm db:migrate:deploy` and `pnpm db:seed` afterwards — there are no prompts, just the two commands.
+- **Runtime client:** app code imports `prisma` from `apps/api/src/db/client.ts` (singleton with `PrismaPg` driver adapter). Do not import `@prisma/client` directly anywhere else — it would create duplicate connection pools on `tsx watch` reloads.
 
 ## Conventional Commits (enforced)
 
