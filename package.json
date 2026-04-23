@@ -17,6 +17,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "clean": "turbo run clean && rimraf node_modules .turbo",
+    "db:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d",
+    "db:down": "docker compose --env-file .env -f infra/docker-compose.yml down",
+    "db:logs": "docker compose --env-file .env -f infra/docker-compose.yml logs -f postgres",
+    "db:reset": "docker compose --env-file .env -f infra/docker-compose.yml down -v && docker compose --env-file .env -f infra/docker-compose.yml up -d",
     "prepare": "husky"
   },
   "lint-staged": {
