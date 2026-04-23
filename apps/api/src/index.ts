@@ -1,4 +1,11 @@
-const name = "@employeek/api";
-const message = `${name} skeleton up — ready for Fastify in change rebuild-api-fastify-ajv-errors`;
+import { prisma } from "./db/client.js";
 
-console.log(message);
+const name = "@employeek/api";
+
+try {
+  const estadoCount = await prisma.estado.count();
+  console.log(`${name} skeleton up — estado count: ${estadoCount}`);
+  console.log("ready for Fastify in change rebuild-api-fastify-ajv-errors");
+} finally {
+  await prisma.$disconnect();
+}
