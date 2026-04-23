@@ -3,18 +3,18 @@
   "ui": "stream",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "db:generate"],
       "outputs": ["dist/**", "!.turbo/**"]
     },
     "lint": {
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "db:generate"],
       "outputs": ["*.tsbuildinfo", ".tsbuildinfo"]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "db:generate"],
       "outputs": ["coverage/**"]
     },
     "dev": {
@@ -23,6 +23,16 @@
     },
     "clean": {
       "cache": false
+    },
+    "db:generate": {
+      "cache": true,
+      "inputs": ["prisma/schema.prisma"],
+      "outputs": [
+        "node_modules/.prisma/**",
+        "node_modules/@prisma/client/**",
+        "../../node_modules/.pnpm/@prisma+client*/node_modules/.prisma/**",
+        "../../node_modules/.pnpm/@prisma+client*/node_modules/@prisma/client/**"
+      ]
     }
   }
 }

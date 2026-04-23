@@ -21,6 +21,11 @@
     "db:down": "docker compose --env-file .env -f infra/docker-compose.yml down",
     "db:logs": "docker compose --env-file .env -f infra/docker-compose.yml logs -f postgres",
     "db:reset": "docker compose --env-file .env -f infra/docker-compose.yml down -v && docker compose --env-file .env -f infra/docker-compose.yml up -d",
+    "db:migrate": "pnpm --filter @employeek/api exec prisma migrate dev",
+    "db:migrate:deploy": "pnpm --filter @employeek/api exec prisma migrate deploy",
+    "db:generate": "pnpm --filter @employeek/api exec prisma generate",
+    "db:seed": "pnpm --filter @employeek/api exec prisma db seed",
+    "db:studio": "pnpm --filter @employeek/api exec prisma studio",
     "prepare": "husky"
   },
   "lint-staged": {
