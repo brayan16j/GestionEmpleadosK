@@ -52,8 +52,31 @@ pnpm dev         # start all apps
 | `pnpm format`       | Prettier --write on the whole repo                   |
 | `pnpm format:check` | Prettier --check (used in CI)                        |
 | `pnpm clean`        | Remove `dist/`, `.turbo/`, `node_modules/`           |
+| `pnpm db:up`        | Start the local Postgres 16 container (detached)     |
+| `pnpm db:down`      | Stop the local Postgres container (volume preserved) |
+| `pnpm db:logs`      | Tail Postgres logs (Ctrl+C to stop, container stays) |
+| `pnpm db:reset`     | **Destructive** — wipe the DB volume and restart     |
 
 Turbo caches all non-`dev` tasks. A second run of the same task is a cache hit and completes in under 2 seconds.
+
+## Local database
+
+EmployeeK uses a Dockerized local Postgres 16 managed by `infra/docker-compose.yml`. The container is the only supported local DB — do not install Postgres on the host for this project.
+
+**Prerequisite:** Docker ≥ 24 with the v2 compose plugin (`docker compose version`).
+
+**One-time setup:**
+
+```bash
+cp .env.example .env   # creates your local, gitignored env file
+pnpm db:up             # pulls postgres:16-alpine and starts the container
+```
+
+Data persists between `db:down` and `db:up` in a named volume (`employeek_pgdata`). `db:reset` drops that volume and restarts with an empty database — use it when you need a clean slate.
+
+If host port `5432` is already taken, set `POSTGRES_PORT=5433` in your `.env` and re-run `pnpm db:up`.
+
+Schema and migrations are **not** managed here — those land with Prisma in the `migrate-sequelize-to-prisma` change (CH3). Right now the DB is empty by design.
 
 ## Conventional Commits (enforced)
 
