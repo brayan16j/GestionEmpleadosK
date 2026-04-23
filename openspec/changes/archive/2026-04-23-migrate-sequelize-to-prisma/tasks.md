@@ -113,5 +113,5 @@
 ## 16. Archive handoff
 
 - [x] 16.1 Verify via `openspec status --change migrate-sequelize-to-prisma --json` that all 4 artifacts are `done` and `isComplete: true`
-- [ ] 16.2 Run `/opsx:archive` to move the change into `openspec/changes/archive/` and sync the `db-schema-prisma` spec into `openspec/specs/` (user-triggered — separate slash command)
-- [ ] 16.3 Merge branch `feat/migrate-sequelize-to-prisma` into `main` (user-authorized — shared-state action, pause per safety protocol)
+- [x] 16.2 Run `/opsx:archive` to move the change into `openspec/changes/archive/` and sync the `db-schema-prisma` spec into `openspec/specs/` (user-triggered — separate slash command)
+- [x] 16.3 Merge branch `feat/migrate-sequelize-to-prisma` into `main` (user-authorized — shared-state action, pause per safety protocol)
