@@ -61,5 +61,5 @@
 ## 10. Archive handoff
 
 - [x] 10.1 Verify via `openspec status --change dockerize-local-postgres --json` that all 4 artifacts are `done` and `isComplete: true`
-- [ ] 10.2 Run `/opsx:archive` to move the change into `openspec/changes/archive/` and sync the `db-local-postgres` spec into `openspec/specs/` (user-triggered — separate slash command)
-- [ ] 10.3 Merge branch `feat/dockerize-local-postgres` into `main` (user-authorized — shared-state action, pause per safety protocol)
+- [x] 10.2 Run `/opsx:archive` to move the change into `openspec/changes/archive/` and sync the `db-local-postgres` spec into `openspec/specs/` (user-triggered — separate slash command)
+- [x] 10.3 Merge branch `feat/dockerize-local-postgres` into `main` (user-authorized — shared-state action, pause per safety protocol)
