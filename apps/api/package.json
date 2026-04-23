@@ -10,12 +10,19 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
     "test": "echo \"(no tests yet)\" && exit 0",
-    "clean": "rimraf dist .turbo .tsbuildinfo"
+    "clean": "rimraf dist .turbo .tsbuildinfo",
+    "db:generate": "prisma generate",
+    "postinstall": "prisma generate"
   },
-  "dependencies": {},
   "devDependencies": {
     "@employeek/eslint-config": "workspace:*",
     "@employeek/tsconfig": "workspace:*",
-    "eslint": "^10.2.1"
+    "eslint": "^10.2.1",
+    "prisma": "^7.8.0",
+    "tsx": "^4.21.0"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0"
   }
 }
