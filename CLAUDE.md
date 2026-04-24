@@ -42,25 +42,25 @@ pnpm dev         # start all apps
 
 ## Root scripts (always run from the repo root)
 
-| Command                  | What it does                                         |
-| ------------------------ | ---------------------------------------------------- |
-| `pnpm dev`               | Turbo runs `dev` in every app (persistent, streamed) |
-| `pnpm build`             | Turbo runs `build` (cached by inputs)                |
-| `pnpm lint`              | ESLint on every workspace                            |
-| `pnpm typecheck`         | TypeScript on every workspace                        |
-| `pnpm test`              | Vitest in every workspace (placeholder for now)      |
-| `pnpm format`            | Prettier --write on the whole repo                   |
-| `pnpm format:check`      | Prettier --check (used in CI)                        |
-| `pnpm clean`             | Remove `dist/`, `.turbo/`, `node_modules/`           |
-| `pnpm db:up`             | Start the local Postgres 16 container (detached)     |
-| `pnpm db:down`           | Stop the local Postgres container (volume preserved) |
-| `pnpm db:logs`           | Tail Postgres logs (Ctrl+C to stop, container stays) |
-| `pnpm db:reset`          | **Destructive** — wipe the DB volume and restart     |
-| `pnpm db:migrate`        | Create/apply a dev migration (`prisma migrate dev`)  |
-| `pnpm db:migrate:deploy` | Apply pending migrations (CI/prod-safe)              |
-| `pnpm db:generate`       | Regenerate the Prisma Client from `schema.prisma`    |
-| `pnpm db:seed`           | Run the seed script (idempotent; populates `estado`) |
-| `pnpm db:studio`         | Open Prisma Studio (browser-based DB explorer)       |
+| Command                  | What it does                                                                                                                             |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`               | Turbo runs `dev` in every app (persistent, streamed)                                                                                     |
+| `pnpm build`             | Turbo runs `build` (cached by inputs)                                                                                                    |
+| `pnpm lint`              | ESLint on every workspace                                                                                                                |
+| `pnpm typecheck`         | TypeScript on every workspace                                                                                                            |
+| `pnpm test`              | Vitest in every workspace — for `@employeek/api` this runs integration tests against the live Postgres container (requires `pnpm db:up`) |
+| `pnpm format`            | Prettier --write on the whole repo                                                                                                       |
+| `pnpm format:check`      | Prettier --check (used in CI)                                                                                                            |
+| `pnpm clean`             | Remove `dist/`, `.turbo/`, `node_modules/`                                                                                               |
+| `pnpm db:up`             | Start the local Postgres 16 container (detached)                                                                                         |
+| `pnpm db:down`           | Stop the local Postgres container (volume preserved)                                                                                     |
+| `pnpm db:logs`           | Tail Postgres logs (Ctrl+C to stop, container stays)                                                                                     |
+| `pnpm db:reset`          | **Destructive** — wipe the DB volume and restart                                                                                         |
+| `pnpm db:migrate`        | Create/apply a dev migration (`prisma migrate dev`)                                                                                      |
+| `pnpm db:migrate:deploy` | Apply pending migrations (CI/prod-safe)                                                                                                  |
+| `pnpm db:generate`       | Regenerate the Prisma Client from `schema.prisma`                                                                                        |
+| `pnpm db:seed`           | Run the seed script (idempotent; populates `estado`)                                                                                     |
+| `pnpm db:studio`         | Open Prisma Studio (browser-based DB explorer)                                                                                           |
 
 Turbo caches all non-`dev` tasks. A second run of the same task is a cache hit and completes in under 2 seconds.
 
@@ -89,6 +89,48 @@ Prisma 7 owns the schema. The source of truth is `apps/api/prisma/schema.prisma`
 - **Seed data** is in `apps/api/prisma/seed.ts` (idempotent upsert of the `estado` catalogue). Run `pnpm db:seed` any time after a migration.
 - **Fresh start:** `pnpm db:reset` drops the volume. You must re-run `pnpm db:migrate:deploy` and `pnpm db:seed` afterwards — there are no prompts, just the two commands.
 - **Runtime client:** app code imports `prisma` from `apps/api/src/db/client.ts` (singleton with `PrismaPg` driver adapter). Do not import `@prisma/client` directly anywhere else — it would create duplicate connection pools on `tsx watch` reloads.
+
+## HTTP API
+
+The backend is a Fastify 5 app with AJV validation, Zod-generated JSON schemas, and RFC 7807 `application/problem+json` error envelopes. Route modules live in `apps/api/src/routes/`, shared JSON schemas in `apps/api/src/schemas/`, and the env contract in `apps/api/src/config/env.ts`.
+
+**Scripts (from the repo root unless noted):**
+
+| Command                                   | What it does                                                                 |
+| ----------------------------------------- | ---------------------------------------------------------------------------- |
+| `pnpm --filter @employeek/api dev`        | `tsx watch src/index.ts` — hot-reload dev server on `$PORT` (default `4000`) |
+| `pnpm --filter @employeek/api build`      | `tsc --build` — emit `dist/` for production                                  |
+| `pnpm --filter @employeek/api test`       | `vitest run` — integration tests using `fastify.inject()` against live DB    |
+| `pnpm --filter @employeek/api test:watch` | `vitest` in watch mode                                                       |
+| `node apps/api/dist/server.js`            | Production start (after `build`); reads env from `.env`                      |
+
+**Required env vars (set in `.env`):**
+
+- `DATABASE_URL` — Postgres connection string (the Docker default works as-is).
+- `PORT` — HTTP port (default `4000`).
+- `HOST` — bind address (default `0.0.0.0`).
+- `CORS_ORIGINS` — comma-separated allowlist (default `http://localhost:5173` for the Vite dev server).
+- `LOG_LEVEL` — Pino level (`debug` / `info` / `warn` / `error`; default `info`).
+
+**Error envelope (RFC 7807):** every 4xx/5xx response is `application/problem+json` with this shape:
+
+```json
+{
+  "type": "https://employeek.local/problems/<slug>",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "The requested record does not exist",
+  "instance": "/empleados/999",
+  "traceId": "req-42",
+  "errors": [{ "path": "body/salario", "message": "must be >= 0" }]
+}
+```
+
+`errors[]` is present only on validation failures (400). `traceId` equals Fastify's `req.id` — the same id that appears in the JSON logs, so you can correlate a failing response with its log line.
+
+**Prisma decorator rule:** routes read the client via `app.prisma`, decorated inside `buildApp()` from the singleton at `apps/api/src/db/client.ts`. Do not `import { prisma }` directly from a route module — the decorator keeps test overrides possible and avoids duplicate client instances under `tsx watch`.
+
+**Port 4000 clash:** the legacy Express app in `legacy/` also defaults to port `4000`. They cannot run simultaneously; override `PORT` in `.env` (e.g. `PORT=4001`) if you need both up at the same time.
 
 ## Conventional Commits (enforced)
 
