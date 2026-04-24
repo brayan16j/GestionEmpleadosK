@@ -154,5 +154,5 @@
 ## 18. Archive handoff
 
 - [x] 18.1 Verify `openspec status --change rebuild-api-fastify-ajv-errors --json` reports all 4 artifacts `done` and `isComplete: true`
-- [ ] 18.2 Run `/opsx:archive` to promote `api-rest` into `openspec/specs/` and move the change into `openspec/changes/archive/` (user-triggered)
-- [ ] 18.3 Merge branch `feat/rebuild-api-fastify-ajv-errors` into `main` (user-authorized — pause per safety protocol)
+- [x] 18.2 Run `/opsx:archive` to promote `api-rest` into `openspec/specs/` and move the change into `openspec/changes/archive/` (user-triggered)
+- [x] 18.3 Merge branch `feat/rebuild-api-fastify-ajv-errors` into `main` (user-authorized — pause per safety protocol)
