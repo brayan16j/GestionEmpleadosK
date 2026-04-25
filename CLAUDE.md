@@ -7,10 +7,10 @@ This file is loaded automatically by Claude Code at the start of every session i
 EmployeeK is a full-stack employee/task management app being rebuilt as an enterprise-grade monorepo. The rebuild happens as a sequence of small, independent OpenSpec changes; each one is self-contained and archivable.
 
 - Language: **TypeScript strict** across all workspaces.
-- Backend: **Fastify** (planned in `rebuild-api-fastify-ajv-errors`).
-- Frontend: **React 18 + Vite** (planned in `rebuild-web-vite-tanstack-query`).
-- ORM: **Prisma** (planned in `migrate-sequelize-to-prisma`).
-- Database: **PostgreSQL** via Docker Compose (planned in `dockerize-local-postgres`).
+- Backend: **Fastify** (`rebuild-api-fastify-ajv-errors`).
+- Frontend: **React 18 + Vite** (`rebuild-web-vite-tanstack-query`).
+- ORM: **Prisma** (`migrate-sequelize-to-prisma`).
+- Database: **PostgreSQL** via Docker Compose (`dockerize-local-postgres`).
 - Monorepo: **pnpm workspaces + Turborepo**.
 - Node: **20 LTS** pinned via `.nvmrc` and `engines`.
 - Package scope: `@employeek/*`.
@@ -19,8 +19,8 @@ EmployeeK is a full-stack employee/task management app being rebuilt as an enter
 
 ```
 apps/
-  api/            # backend — TS skeleton now, Fastify later
-  web/            # frontend — TS skeleton now, Vite+React later
+  api/            # backend — Fastify 5 + Prisma + AJV + RFC 7807
+  web/            # frontend — Vite 5 + React 18 + TanStack Query + Tailwind
 packages/
   eslint-config/  # @employeek/eslint-config — shared flat config
   tsconfig/       # @employeek/tsconfig — shared TS presets
@@ -42,25 +42,25 @@ pnpm dev         # start all apps
 
 ## Root scripts (always run from the repo root)
 
-| Command                  | What it does                                                                                                                             |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm dev`               | Turbo runs `dev` in every app (persistent, streamed)                                                                                     |
-| `pnpm build`             | Turbo runs `build` (cached by inputs)                                                                                                    |
-| `pnpm lint`              | ESLint on every workspace                                                                                                                |
-| `pnpm typecheck`         | TypeScript on every workspace                                                                                                            |
-| `pnpm test`              | Vitest in every workspace — for `@employeek/api` this runs integration tests against the live Postgres container (requires `pnpm db:up`) |
-| `pnpm format`            | Prettier --write on the whole repo                                                                                                       |
-| `pnpm format:check`      | Prettier --check (used in CI)                                                                                                            |
-| `pnpm clean`             | Remove `dist/`, `.turbo/`, `node_modules/`                                                                                               |
-| `pnpm db:up`             | Start the local Postgres 16 container (detached)                                                                                         |
-| `pnpm db:down`           | Stop the local Postgres container (volume preserved)                                                                                     |
-| `pnpm db:logs`           | Tail Postgres logs (Ctrl+C to stop, container stays)                                                                                     |
-| `pnpm db:reset`          | **Destructive** — wipe the DB volume and restart                                                                                         |
-| `pnpm db:migrate`        | Create/apply a dev migration (`prisma migrate dev`)                                                                                      |
-| `pnpm db:migrate:deploy` | Apply pending migrations (CI/prod-safe)                                                                                                  |
-| `pnpm db:generate`       | Regenerate the Prisma Client from `schema.prisma`                                                                                        |
-| `pnpm db:seed`           | Run the seed script (idempotent; populates `estado`)                                                                                     |
-| `pnpm db:studio`         | Open Prisma Studio (browser-based DB explorer)                                                                                           |
+| Command                  | What it does                                                                                                                                                                |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`               | Turbo runs `dev` in every app (persistent, streamed)                                                                                                                        |
+| `pnpm build`             | Turbo runs `build` (cached by inputs)                                                                                                                                       |
+| `pnpm lint`              | ESLint on every workspace                                                                                                                                                   |
+| `pnpm typecheck`         | TypeScript on every workspace                                                                                                                                               |
+| `pnpm test`              | Vitest in every workspace — `@employeek/api` runs integration tests against the live DB (requires `pnpm db:up`); `@employeek/web` runs jsdom component tests (no DB needed) |
+| `pnpm format`            | Prettier --write on the whole repo                                                                                                                                          |
+| `pnpm format:check`      | Prettier --check (used in CI)                                                                                                                                               |
+| `pnpm clean`             | Remove `dist/`, `.turbo/`, `node_modules/`                                                                                                                                  |
+| `pnpm db:up`             | Start the local Postgres 16 container (detached)                                                                                                                            |
+| `pnpm db:down`           | Stop the local Postgres container (volume preserved)                                                                                                                        |
+| `pnpm db:logs`           | Tail Postgres logs (Ctrl+C to stop, container stays)                                                                                                                        |
+| `pnpm db:reset`          | **Destructive** — wipe the DB volume and restart                                                                                                                            |
+| `pnpm db:migrate`        | Create/apply a dev migration (`prisma migrate dev`)                                                                                                                         |
+| `pnpm db:migrate:deploy` | Apply pending migrations (CI/prod-safe)                                                                                                                                     |
+| `pnpm db:generate`       | Regenerate the Prisma Client from `schema.prisma`                                                                                                                           |
+| `pnpm db:seed`           | Run the seed script (idempotent; populates `estado`)                                                                                                                        |
+| `pnpm db:studio`         | Open Prisma Studio (browser-based DB explorer)                                                                                                                              |
 
 Turbo caches all non-`dev` tasks. A second run of the same task is a cache hit and completes in under 2 seconds.
 
@@ -132,6 +132,28 @@ The backend is a Fastify 5 app with AJV validation, Zod-generated JSON schemas, 
 
 **Port 4000 clash:** the legacy Express app in `legacy/` also defaults to port `4000`. They cannot run simultaneously; override `PORT` in `.env` (e.g. `PORT=4001`) if you need both up at the same time.
 
+## Web app
+
+The frontend is a Vite 5 SPA (`apps/web/`) with React 18, TypeScript strict, TanStack Query v5, React Hook Form + Zod v3, Tailwind CSS v3, and shadcn/ui primitives.
+
+**Scripts (from the repo root unless noted):**
+
+| Command                                   | What it does                                                 |
+| ----------------------------------------- | ------------------------------------------------------------ |
+| `pnpm --filter @employeek/web dev`        | `vite` — hot-reload dev server on port `5173`                |
+| `pnpm --filter @employeek/web build`      | `tsc && vite build` — type-check then emit `dist/`           |
+| `pnpm --filter @employeek/web preview`    | `vite preview --port 5173` — serve the built `dist/` locally |
+| `pnpm --filter @employeek/web test`       | `vitest run` — jsdom component tests (no DB required)        |
+| `pnpm --filter @employeek/web test:watch` | `vitest` in watch mode                                       |
+
+**Required env var (set in `.env`):**
+
+- `VITE_API_URL` — base URL of the Fastify API (default `http://localhost:4000`). Only variables prefixed `VITE_` are exposed to the browser bundle.
+
+**HTTP client:** every network call goes through `apps/web/src/lib/http.ts`. Do not call `fetch()` directly elsewhere — the `no-restricted-globals` ESLint rule enforces this. The helper reads `VITE_API_URL`, sets `Content-Type: application/json` when a body is present, and throws `ApiProblem` on any non-2xx response.
+
+**Error model (RFC 7807):** `ApiProblem extends Error` lives in `src/lib/problem.ts`. It hydrates from the same `application/problem+json` envelope the API emits (type / title / status / detail / traceId / errors[]). `src/lib/applyProblemToForm.ts` maps `body/<field>` paths from `errors[]` onto React Hook Form field errors; anything unmapped falls back to a Sonner toast.
+
 ## Conventional Commits (enforced)
 
 Commits are validated by **commitlint** via the `commit-msg` husky hook. The format is:
@@ -180,11 +202,12 @@ Each change lives in `openspec/changes/<kebab-name>/` with:
 - `specs/<capability>/spec.md` — what (SHALL/WHEN/THEN requirements)
 - `tasks.md` — ordered implementation checklist
 
-## Legacy code is quarantined
+## Quarantined code — do not modify
 
-**`legacy/` contains the original Express + Sequelize app.** Do not modify files inside it. Do not add it to `pnpm-workspace.yaml` or Turbo pipelines. It exists to prove the previous system still works; it is removed in the `retire-legacy-express-stack` change when the new API has reached parity.
+Two directories are read-only reference material:
 
-If you need to reference legacy behaviour, read the files — do not refactor in place.
+- **`legacy/`** — the original Express + Sequelize app. Not wired into `pnpm-workspace.yaml` or Turbo. Removed in `retire-legacy-express-stack` once the Fastify API reaches parity. Read for reference; never refactor in place.
+- **`D:\Proyectos Konecta\FRONTK1\`** — the original React frontend (outside this repo). Serves as a reference for screens being ported to `apps/web`. Do not modify anything there.
 
 ## Stack details and gotchas
 
