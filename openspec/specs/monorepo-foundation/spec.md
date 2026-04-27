@@ -127,6 +127,53 @@ The repository SHALL contain a `CLAUDE.md` at the root that documents:
 - **WHEN** a new contributor opens the repo and reads `CLAUDE.md`
 - **THEN** they can run `pnpm install && pnpm dev` and understand the commit/change workflow without asking
 
+### Requirement: `packages/api-types` workspace is registered and orchestrated by Turbo
+
+The `packages/api-types/` directory SHALL be recognized automatically by pnpm (via the existing `packages/*` glob in `pnpm-workspace.yaml`) and SHALL be listed in the Turbo pipeline so that `pnpm build` orchestrates its build task in dependency order. `turbo.json` SHALL include a task entry for `@employeek/api-types#build` with `dependsOn: ["@employeek/api#openapi:dump"]`.
+
+#### Scenario: `packages/api-types` appears in the workspace listing
+
+- **WHEN** a developer runs `pnpm m ls --depth -1` after `pnpm install`
+- **THEN** `@employeek/api-types` is listed alongside `@employeek/api`, `@employeek/web`, `@employeek/tsconfig`, and `@employeek/eslint-config`
+
+#### Scenario: Turbo respects api-types build order
+
+- **WHEN** a developer runs `pnpm build` from the repo root
+- **THEN** Turbo completes `@employeek/api#openapi:dump` before starting `@employeek/api-types#build`
+
+### Requirement: Root scripts expose `api:openapi` and `api:types` convenience commands
+
+The root `package.json` SHALL expose:
+
+- `api:openapi` — proxies to `pnpm --filter @employeek/api openapi:dump` (dumps the live OpenAPI snapshot).
+- `api:types` — runs `api:openapi` then `pnpm --filter @employeek/api-types build` (end-to-end contract pipeline).
+
+These commands are part of the standard developer interface documented in `CLAUDE.md`.
+
+#### Scenario: `pnpm api:openapi` updates the snapshot
+
+- **WHEN** a developer runs `pnpm api:openapi` from the repo root
+- **THEN** `packages/api-types/openapi.json` is written (or overwritten) without requiring the developer to know the underlying filter command
+
+#### Scenario: `pnpm api:types` regenerates types end-to-end
+
+- **WHEN** a developer runs `pnpm api:types` after adding a new route
+- **THEN** the snapshot is refreshed and `packages/api-types/dist/` is rebuilt, making new types available to `apps/web`
+
+### Requirement: `packages/api-types` follows the TypeScript strict baseline
+
+`packages/api-types/tsconfig.json` SHALL extend `@employeek/tsconfig/base.json` (strict, NodeNext, ES2022) so that its source and generated types are checked under the same rules as every other workspace.
+
+#### Scenario: Typecheck covers `packages/api-types`
+
+- **WHEN** a developer runs `pnpm typecheck` from the root
+- **THEN** TypeScript validates `packages/api-types/src/index.ts` (and any other `.ts` files there) using project references and exits with code `0` if all pass
+
+#### Scenario: Strict violations in `packages/api-types` are caught
+
+- **WHEN** a developer introduces an implicit `any` in `packages/api-types/src/index.ts`
+- **THEN** `pnpm typecheck` fails with a `noImplicitAny` error pointing at the offending line
+
 ### Requirement: Root scripts provide a unified developer interface
 The root `package.json` SHALL expose at least these scripts, each delegating to Turborepo or the appropriate tool:
 - `pnpm dev` — run all apps in development mode.

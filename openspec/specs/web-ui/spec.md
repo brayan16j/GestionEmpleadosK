@@ -23,9 +23,9 @@ The `apps/web` workspace SHALL be a Vite 5.x SPA using React 18.x, TypeScript st
 - **WHEN** inspecting `apps/web/package.json`
 - **THEN** neither `next`, `@remix-run/*`, nor `react-scripts` appears in `dependencies` or `devDependencies`
 
-### Requirement: Single HTTP helper parses the RFC 7807 problem envelope
+### Requirement: Single HTTP helper parses the RFC 7807 problem envelope and accepts typed paths via `@employeek/api-types`
 
-The web app SHALL route every API call through `src/lib/http.ts`, which reads `import.meta.env.VITE_API_URL` (default `http://localhost:4000`), sets `Content-Type: application/json` for requests with a body, and on any `response.ok === false` parses the response as `application/problem+json` and throws an `ApiProblem` error carrying `{ type, title, status, detail, instance, traceId, errors? }`. No React component or query hook SHALL call the global `fetch` directly.
+The web app SHALL route every API call through `src/lib/http.ts`, which reads `import.meta.env.VITE_API_URL` (default `http://localhost:4000`), sets `Content-Type: application/json` for requests with a body, and on any `response.ok === false` parses the response as `application/problem+json` and throws an `ApiProblem` error carrying `{ type, title, status, detail, instance, traceId, errors? }`. No React component or query hook SHALL call the global `fetch` directly. The `http` helper's path parameter SHOULD be typed against the `paths` interface from `@employeek/api-types` so that callers get compile-time feedback for unknown API endpoints.
 
 #### Scenario: Success path returns the parsed JSON body
 
@@ -195,6 +195,34 @@ The app SHALL use Tailwind CSS v3 with a `tailwind.config.ts` covering `src/**/*
 
 - **WHEN** a reader opens `CLAUDE.md`
 - **THEN** there is a "Web app" (or equivalent) section that names `VITE_API_URL`, points at `src/lib/http.ts`, references the RFC 7807 error model, and states that FRONTK1 is quarantined
+
+### Requirement: Feature API modules consume `Schema<K>` from `@employeek/api-types`
+
+Every `src/features/<resource>/api.ts` module SHALL import response and request types exclusively from `@employeek/api-types` using the `Schema<K>`, `RequestBody<P, M>`, and `ResponseBody<P, M, S>` helpers. Plain `interface` or `type` definitions that duplicate an API response shape SHALL NOT be introduced — they diverge silently when the API changes.
+
+#### Scenario: Empleado type comes from the generated types
+
+- **WHEN** a developer opens `src/features/empleados/api.ts`
+- **THEN** the `Empleado` type is imported as `Schema<'Empleado'>` from `@employeek/api-types`, not declared inline
+
+#### Scenario: Stale local interface triggers a type error
+
+- **WHEN** a developer changes the `Empleado` schema in `apps/api/src/schemas/empleado.ts`, regenerates the snapshot, and rebuilds `@employeek/api-types`
+- **THEN** any local `interface Empleado { ... }` in `apps/web` that no longer matches causes a TypeScript compile error, whereas `Schema<'Empleado'>` automatically reflects the new shape
+
+### Requirement: `apps/web` declares `@employeek/api-types` as a workspace dependency
+
+`apps/web/package.json` SHALL list `"@employeek/api-types": "workspace:*"` under `dependencies`. This ensures pnpm links the local workspace package and Turbo knows to rebuild the web app when `@employeek/api-types` changes.
+
+#### Scenario: Dependency is symlinked after install
+
+- **WHEN** a developer runs `pnpm install` on a fresh clone
+- **THEN** `apps/web/node_modules/@employeek/api-types` is a symlink pointing to `packages/api-types`
+
+#### Scenario: Turbo rebuilds web when api-types changes
+
+- **WHEN** a developer modifies a route schema, regenerates the snapshot, and runs `pnpm build`
+- **THEN** Turbo rebuilds `@employeek/api-types` first and then rebuilds `@employeek/web`, surfacing any type errors caused by the schema change
 
 ### Requirement: Environment defaults live in `.env.example` and Vite-prefixed vars
 

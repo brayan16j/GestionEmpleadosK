@@ -310,6 +310,64 @@ The `legacy/` directory SHALL NOT be modified by this change. Legacy Express rou
 - **WHEN** grepping `legacy/` for `fastify` or `@fastify/`
 - **THEN** there are zero matches
 
+### Requirement: Every route declares OpenAPI metadata (`tags`, `operationId`, `summary`, `description`)
+
+Every route registered in `apps/api/src/routes/*.ts` SHALL include `tags`, `operationId`, `summary`, and `description` in its `schema` block so that `@fastify/swagger` generates a fully-annotated OpenAPI document. This requirement records the metadata obligation in the REST surface spec; the full contract for how the document is generated, exposed, and consumed is in `api-contract`.
+
+#### Scenario: Route metadata is present on every endpoint
+
+- **WHEN** a developer inspects any route file under `apps/api/src/routes/`
+- **THEN** every `fastify.get / .post / .put / .delete` call includes a `schema.tags` array, a `schema.operationId` string, a `schema.summary` string, and a `schema.description` string
+
+#### Scenario: Absence of metadata is caught before merge
+
+- **WHEN** a developer adds a route without `operationId` and pushes the branch
+- **THEN** the CI typecheck or lint step fails before the pull request can be merged
+
+### Requirement: `buildApp` registers `@fastify/swagger` and conditionally `@fastify/swagger-ui`
+
+`apps/api/src/app.ts` (`buildApp()`) SHALL register `@fastify/swagger` unconditionally (before any route plugin) and register `@fastify/swagger-ui` only when `app.config.OPENAPI_UI_ENABLED === true`. Both registrations are part of the app boot lifecycle and therefore belong to the REST surface.
+
+#### Scenario: Swagger plugin registered before routes
+
+- **WHEN** a developer reads `buildApp()` in `apps/api/src/app.ts`
+- **THEN** the swagger plugin registration appears after `@fastify/cors` and before the first `app.register(*Routes, ...)` call
+
+#### Scenario: Swagger UI absent when disabled
+
+- **WHEN** `app.config.OPENAPI_UI_ENABLED === false` and a client requests `GET /docs`
+- **THEN** the response is `404` — the UI plugin was never registered
+
+### Requirement: `OPENAPI_UI_ENABLED` env var extends the API env schema
+
+`apps/api/src/config/env.ts` SHALL add `OPENAPI_UI_ENABLED` (boolean, defaulting to `true` in `development`/`test` and `false` in `production`) to the `envZ` Zod schema. This keeps the env contract co-located with the other API env vars already declared there.
+
+#### Scenario: Missing var defaults correctly per NODE_ENV
+
+- **WHEN** `.env` does not set `OPENAPI_UI_ENABLED` and `NODE_ENV=development`
+- **THEN** `app.config.OPENAPI_UI_ENABLED === true`
+- **WHEN** the same `.env` is used with `NODE_ENV=production`
+- **THEN** `app.config.OPENAPI_UI_ENABLED === false`
+
+#### Scenario: `app.config` is typed
+
+- **WHEN** a TypeScript route handler reads `app.config.OPENAPI_UI_ENABLED`
+- **THEN** its type is `boolean` and the compiler rejects treating it as a string
+
+### Requirement: OpenAPI snapshot test guards against undocumented drift
+
+`apps/api/test/openapi-snapshot.test.ts` SHALL be part of the standard Vitest suite and SHALL fail with an actionable message when `app.swagger()` diverges from the committed `packages/api-types/openapi.json`. This test runs as part of `pnpm --filter @employeek/api test` and protects consumers of `@employeek/api-types` from stale generated types.
+
+#### Scenario: Test passes when snapshot is current
+
+- **WHEN** `packages/api-types/openapi.json` is up to date and `pnpm --filter @employeek/api test` is run
+- **THEN** the snapshot test passes alongside the other integration tests
+
+#### Scenario: Test fails with instructions on drift
+
+- **WHEN** a developer changes a route schema without regenerating the snapshot
+- **THEN** the snapshot test fails with `Error: OpenAPI snapshot is out of date. Run 'pnpm api:types' to regenerate.`
+
 ### Requirement: Developer documentation covers the API workflow
 
 `CLAUDE.md` SHALL include an "HTTP API" section documenting:
