@@ -1,0 +1,1222 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "EmployeeK API",
+    "version": "0.0.0",
+    "description": "REST API for EmployeeK — employee and task management. Fastify 5 + Prisma + AJV + RFC 7807 error envelopes."
+  },
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "required": ["type", "title", "status", "instance", "traceId"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 599
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "traceId": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["path", "message"],
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Empleado": {
+        "type": "object",
+        "required": ["id", "nombre", "fechaIngreso", "salario", "createdAt", "updatedAt"],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "fechaIngreso": {
+            "type": "string",
+            "format": "date"
+          },
+          "salario": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateEmpleadoBody": {
+        "type": "object",
+        "required": ["nombre", "fechaIngreso", "salario"],
+        "additionalProperties": false,
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "fechaIngreso": {
+            "type": "string",
+            "format": "date"
+          },
+          "salario": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "UpdateEmpleadoBody": {
+        "type": "object",
+        "required": ["nombre", "fechaIngreso", "salario"],
+        "additionalProperties": false,
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "fechaIngreso": {
+            "type": "string",
+            "format": "date"
+          },
+          "salario": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "EmpleadoIdParams": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "Estado": {
+        "type": "object",
+        "required": ["id", "nombre", "categoria"],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "categoria": {
+            "type": "string"
+          },
+          "cambiosPermitidos": {
+            "type": ["null", "string"]
+          }
+        }
+      },
+      "CreateEstadoBody": {
+        "type": "object",
+        "required": ["nombre", "categoria"],
+        "additionalProperties": false,
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "categoria": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "cambiosPermitidos": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "UpdateEstadoBody": {
+        "type": "object",
+        "required": ["nombre", "categoria"],
+        "additionalProperties": false,
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "categoria": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "cambiosPermitidos": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "EstadoIdParams": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "Tarea": {
+        "type": "object",
+        "required": [
+          "id",
+          "nombre",
+          "fechaCreacion",
+          "fechaInicioTarea",
+          "fechaFinalizacion",
+          "idEmpleado",
+          "idEstado"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaInicioTarea": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaFinalizacion": {
+            "type": "string",
+            "format": "date"
+          },
+          "idEmpleado": {
+            "type": "integer"
+          },
+          "idEstado": {
+            "type": "integer"
+          },
+          "empleadoNombre": {
+            "type": "string"
+          },
+          "estadoNombre": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateTareaBody": {
+        "type": "object",
+        "required": [
+          "nombre",
+          "fechaCreacion",
+          "fechaInicioTarea",
+          "fechaFinalizacion",
+          "idEmpleado"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaInicioTarea": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaFinalizacion": {
+            "type": "string",
+            "format": "date"
+          },
+          "idEmpleado": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "estadoNombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "UpdateTareaBody": {
+        "type": "object",
+        "required": [
+          "nombre",
+          "fechaCreacion",
+          "fechaInicioTarea",
+          "fechaFinalizacion",
+          "idEmpleado"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaInicioTarea": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaFinalizacion": {
+            "type": "string",
+            "format": "date"
+          },
+          "idEmpleado": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "CambiarEstadoBody": {
+        "type": "object",
+        "required": ["idEstado"],
+        "additionalProperties": false,
+        "properties": {
+          "idEstado": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "TareaIdParams": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "CategoriaParams": {
+        "type": "object",
+        "required": ["categoria"],
+        "properties": {
+          "categoria": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "livenessCheck",
+        "summary": "Liveness probe",
+        "tags": ["Health"],
+        "description": "Always returns 200. Does not touch the database.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "readinessCheck",
+        "summary": "Readiness probe",
+        "tags": ["Health"],
+        "description": "Returns 200 when the database is reachable, 503 otherwise.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/empleados/": {
+      "get": {
+        "operationId": "listEmpleados",
+        "summary": "List all employees",
+        "tags": ["Empleados"],
+        "description": "Returns an array of all employees ordered by id ascending.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Empleado"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createEmpleado",
+        "summary": "Create an employee",
+        "tags": ["Empleados"],
+        "description": "Creates and returns the new employee with status 201.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEmpleadoBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empleado"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/empleados/{id}": {
+      "get": {
+        "operationId": "getEmpleado",
+        "summary": "Get an employee by id",
+        "tags": ["Empleados"],
+        "description": "Returns a single employee. 404 if not found.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empleado"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateEmpleado",
+        "summary": "Update an employee",
+        "tags": ["Empleados"],
+        "description": "Replaces all mutable fields of an employee. 404 if not found.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmpleadoBody"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empleado"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteEmpleado",
+        "summary": "Delete an employee",
+        "tags": ["Empleados"],
+        "description": "Deletes the employee. 204 on success, 404 if not found, 422 if the employee owns tasks (FK restrict).",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/empleados/{id}/tareas": {
+      "get": {
+        "operationId": "listTareasForEmpleado",
+        "summary": "List tasks for an employee",
+        "tags": ["Empleados"],
+        "description": "Returns all tasks assigned to the employee. Empty array if none. 404 if the employee does not exist.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tarea"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estados/": {
+      "get": {
+        "operationId": "listEstados",
+        "summary": "List all statuses",
+        "tags": ["Estados"],
+        "description": "Returns all status catalogue entries ordered by id ascending.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Estado"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createEstado",
+        "summary": "Create a status",
+        "tags": ["Estados"],
+        "description": "Creates a new status entry. 409 if the name already exists.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEstadoBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Estado"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estados/{id}": {
+      "get": {
+        "operationId": "getEstado",
+        "summary": "Get a status by id",
+        "tags": ["Estados"],
+        "description": "Returns a single status entry. 404 if not found.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Estado"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateEstado",
+        "summary": "Update a status",
+        "tags": ["Estados"],
+        "description": "Replaces all mutable fields of a status entry. 404 if not found.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEstadoBody"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Estado"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteEstado",
+        "summary": "Delete a status",
+        "tags": ["Estados"],
+        "description": "Deletes the status. 204 on success, 404 if not found, 422 if referenced by any task (FK restrict).",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tareas/": {
+      "get": {
+        "operationId": "listTareas",
+        "summary": "List all tasks",
+        "tags": ["Tareas"],
+        "description": "Returns all tasks ordered by id ascending. Each item includes the related employee name and status name.",
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tarea"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createTarea",
+        "summary": "Create a task",
+        "tags": ["Tareas"],
+        "description": "Creates a new task. If estadoNombre is omitted, the task defaults to 'pendiente'. 404 if the referenced employee or status does not exist.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTareaBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tarea"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tareas/categoria/{categoria}": {
+      "get": {
+        "operationId": "listTareasByCategoria",
+        "summary": "List tasks by status category",
+        "tags": ["Tareas"],
+        "description": "Returns tasks whose related status category matches the path parameter. Uses a parameterized query (no SQL injection risk).",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "in": "path",
+            "name": "categoria",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tarea"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tareas/{id}": {
+      "get": {
+        "operationId": "getTarea",
+        "summary": "Get a task by id",
+        "tags": ["Tareas"],
+        "description": "Returns a single task with related employee and status names. 404 if not found.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tarea"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateTarea",
+        "summary": "Update a task",
+        "tags": ["Tareas"],
+        "description": "Replaces all mutable fields of a task except status. Use PUT /:id/estado to change status. 404 if not found.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTareaBody"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tarea"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteTarea",
+        "summary": "Delete a task",
+        "tags": ["Tareas"],
+        "description": "Deletes the task. 204 on success, 404 if not found.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tareas/{id}/estado": {
+      "put": {
+        "operationId": "changeTareaEstado",
+        "summary": "Change task status",
+        "tags": ["Tareas"],
+        "description": "Transitions the task to a new status, validated against the current status's cambiosPermitidos list. 400 if the transition is not allowed.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CambiarEstadoBody"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "in": "path",
+            "name": "id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tarea"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Local dev"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Liveness and readiness checks"
+    },
+    {
+      "name": "Empleados",
+      "description": "Employee resource"
+    },
+    {
+      "name": "Estados",
+      "description": "Status catalogue"
+    },
+    {
+      "name": "Tareas",
+      "description": "Task resource"
+    }
+  ]
+}

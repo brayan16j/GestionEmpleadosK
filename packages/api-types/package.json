@@ -1,0 +1,32 @@
+{
+  "name": "@employeek/api-types",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "openapi.json"
+  ],
+  "scripts": {
+    "build": "openapi-typescript ./openapi.json -o ./src/generated.ts && tsc --build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "clean": "rimraf dist src/generated.ts .tsbuildinfo"
+  },
+  "devDependencies": {
+    "@employeek/eslint-config": "workspace:*",
+    "@employeek/tsconfig": "workspace:*",
+    "eslint": "^10.2.1",
+    "openapi-typescript": "^7.8.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3"
+  }
+}
