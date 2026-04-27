@@ -37,6 +37,16 @@
         "../../node_modules/.pnpm/@prisma+client*/node_modules/.prisma/**",
         "../../node_modules/.pnpm/@prisma+client*/node_modules/@prisma/client/**"
       ]
+    },
+    "@employeek/api#openapi:dump": {
+      "cache": true,
+      "inputs": ["src/**", "package.json", "tsconfig.json"],
+      "outputs": ["../../packages/api-types/openapi.json"]
+    },
+    "@employeek/api-types#build": {
+      "dependsOn": ["@employeek/api#openapi:dump"],
+      "inputs": ["openapi.json", "src/**", "tsconfig.json", "package.json"],
+      "outputs": ["dist/**", "src/generated.ts"]
     }
   }
 }

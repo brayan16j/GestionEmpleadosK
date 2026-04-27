@@ -26,6 +26,8 @@
     "db:generate": "pnpm --filter @employeek/api exec prisma generate",
     "db:seed": "pnpm --filter @employeek/api exec prisma db seed",
     "db:studio": "pnpm --filter @employeek/api exec prisma studio",
+    "api:openapi": "pnpm --filter @employeek/api openapi:dump",
+    "api:types": "pnpm api:openapi && pnpm --filter @employeek/api-types build",
     "prepare": "husky"
   },
   "lint-staged": {
