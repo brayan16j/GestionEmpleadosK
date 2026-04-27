@@ -1,6 +1,8 @@
 import { http } from "@/lib/http";
-import type { Empleado, CreateEmpleadoInput, UpdateEmpleadoInput } from "./schemas";
-import type { Tarea } from "@/features/tareas/schemas";
+import type { Schema } from "@employeek/api-types";
+import type { CreateEmpleadoInput, UpdateEmpleadoInput } from "./schemas";
+
+export type Empleado = Schema<"Empleado">;
 
 export const listEmpleados = () => http<Empleado[]>("GET", "/empleados");
 
@@ -15,4 +17,4 @@ export const updateEmpleado = (id: number, body: UpdateEmpleadoInput) =>
 export const deleteEmpleado = (id: number) => http<void>("DELETE", `/empleados/${id}`);
 
 export const listTareasForEmpleado = (id: number) =>
-  http<Tarea[]>("GET", `/empleados/${id}/tareas`);
+  http<Schema<"Tarea">[]>("GET", `/empleados/${id}/tareas`);

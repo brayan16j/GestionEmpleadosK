@@ -10,10 +10,3 @@ export const updateEstadoSchema = createEstadoSchema;
 
 export type CreateEstadoInput = z.infer<typeof createEstadoSchema>;
 export type UpdateEstadoInput = z.infer<typeof updateEstadoSchema>;
-
-export interface Estado {
-  id: number;
-  nombre: string;
-  categoria: string;
-  cambiosPermitidos?: string | null;
-}

@@ -1,5 +1,8 @@
 import { http } from "@/lib/http";
-import type { Estado, CreateEstadoInput, UpdateEstadoInput } from "./schemas";
+import type { Schema } from "@employeek/api-types";
+import type { CreateEstadoInput, UpdateEstadoInput } from "./schemas";
+
+export type Estado = Schema<"Estado">;
 
 export const listEstados = () => http<Estado[]>("GET", "/estados");
 

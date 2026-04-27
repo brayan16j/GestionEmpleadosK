@@ -1,5 +1,8 @@
 import { http } from "@/lib/http";
-import type { Tarea, CreateTareaInput, UpdateTareaInput, CambiarEstadoInput } from "./schemas";
+import type { Schema } from "@employeek/api-types";
+import type { CreateTareaInput, UpdateTareaInput, CambiarEstadoInput } from "./schemas";
+
+export type Tarea = Schema<"Tarea">;
 
 export const listTareas = () => http<Tarea[]>("GET", "/tareas");
 

@@ -24,15 +24,3 @@ export const cambiarEstadoSchema = z.object({
 export type CreateTareaInput = z.infer<typeof createTareaSchema>;
 export type UpdateTareaInput = z.infer<typeof updateTareaSchema>;
 export type CambiarEstadoInput = z.infer<typeof cambiarEstadoSchema>;
-
-export interface Tarea {
-  id: number;
-  nombre: string;
-  fechaCreacion: string;
-  fechaInicioTarea: string;
-  fechaFinalizacion: string;
-  idEmpleado: number;
-  idEstado: number;
-  empleadoNombre?: string;
-  estadoNombre?: string;
-}

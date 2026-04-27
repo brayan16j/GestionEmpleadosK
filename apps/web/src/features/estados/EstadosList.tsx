@@ -19,7 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { ApiProblem } from "@/lib/problem";
-import type { Estado } from "./schemas";
+import type { Estado } from "./api";
 
 export function EstadosList() {
   const { data: estados, isLoading } = useEstados();

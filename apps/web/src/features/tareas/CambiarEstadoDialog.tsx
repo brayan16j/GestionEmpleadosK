@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { cambiarEstadoSchema, type CambiarEstadoInput, type Tarea } from "./schemas";
+import { cambiarEstadoSchema, type CambiarEstadoInput } from "./schemas";
+import type { Tarea } from "./api";
 import { useCambiarEstado } from "./queries";
 import { useEstados } from "@/features/estados/queries";
 import { Button } from "@/components/ui/button";

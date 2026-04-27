@@ -10,12 +10,3 @@ export const updateEmpleadoSchema = createEmpleadoSchema;
 
 export type CreateEmpleadoInput = z.infer<typeof createEmpleadoSchema>;
 export type UpdateEmpleadoInput = z.infer<typeof updateEmpleadoSchema>;
-
-export interface Empleado {
-  id: number;
-  nombre: string;
-  fechaIngreso: string;
-  salario: string;
-  createdAt: string;
-  updatedAt: string;
-}
