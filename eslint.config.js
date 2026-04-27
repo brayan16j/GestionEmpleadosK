@@ -13,6 +13,7 @@ export default [
       "**/*.d.ts",
       "**/*.js.map",
       "**/*.d.ts.map",
+      "packages/api-types/src/generated.ts",
     ],
   },
   ...config,
