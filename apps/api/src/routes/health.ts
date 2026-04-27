@@ -1,15 +1,16 @@
 import type { FastifyPluginAsync } from "fastify";
 
-import { healthResponseSchema } from "../schemas/health.js";
-import { problemSchema } from "../schemas/problem.js";
-
 export const healthRoutes: FastifyPluginAsync = async (app) => {
   app.get(
     "/health",
     {
       schema: {
+        tags: ["Health"],
+        operationId: "livenessCheck",
+        summary: "Liveness probe",
+        description: "Always returns 200. Does not touch the database.",
         response: {
-          200: healthResponseSchema,
+          200: { $ref: "HealthResponse#" },
         },
       },
     },
@@ -20,9 +21,13 @@ export const healthRoutes: FastifyPluginAsync = async (app) => {
     "/health/ready",
     {
       schema: {
+        tags: ["Health"],
+        operationId: "readinessCheck",
+        summary: "Readiness probe",
+        description: "Returns 200 when the database is reachable, 503 otherwise.",
         response: {
-          200: healthResponseSchema,
-          503: problemSchema,
+          200: { $ref: "HealthResponse#" },
+          503: { $ref: "Problem#" },
         },
       },
     },

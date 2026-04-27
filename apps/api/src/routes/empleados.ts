@@ -1,16 +1,9 @@
 import type { FastifyPluginAsync } from "fastify";
-
-import {
-  createEmpleadoBodySchema,
-  empleadoIdParamsSchema,
-  empleadoSchema,
-  updateEmpleadoBodySchema,
-  type CreateEmpleadoBody,
-  type EmpleadoIdParams,
-  type UpdateEmpleadoBody,
+import type {
+  CreateEmpleadoBody,
+  EmpleadoIdParams,
+  UpdateEmpleadoBody,
 } from "../schemas/empleado.js";
-import { tareaSchema } from "../schemas/tarea.js";
-import { problemSchema } from "../schemas/problem.js";
 
 function serializeEmpleado(row: {
   id: number;
@@ -35,8 +28,12 @@ export const empleadosRoutes: FastifyPluginAsync = async (app) => {
     "/",
     {
       schema: {
+        tags: ["Empleados"],
+        operationId: "listEmpleados",
+        summary: "List all employees",
+        description: "Returns an array of all employees ordered by id ascending.",
         response: {
-          200: { type: "array", items: empleadoSchema },
+          200: { type: "array", items: { $ref: "Empleado#" } },
         },
       },
     },
@@ -50,8 +47,12 @@ export const empleadosRoutes: FastifyPluginAsync = async (app) => {
     "/:id",
     {
       schema: {
-        params: empleadoIdParamsSchema,
-        response: { 200: empleadoSchema, 404: problemSchema },
+        tags: ["Empleados"],
+        operationId: "getEmpleado",
+        summary: "Get an employee by id",
+        description: "Returns a single employee. 404 if not found.",
+        params: { $ref: "EmpleadoIdParams#" },
+        response: { 200: { $ref: "Empleado#" }, 404: { $ref: "Problem#" } },
       },
     },
     async (req) => {
@@ -65,8 +66,12 @@ export const empleadosRoutes: FastifyPluginAsync = async (app) => {
     "/",
     {
       schema: {
-        body: createEmpleadoBodySchema,
-        response: { 201: empleadoSchema, 400: problemSchema },
+        tags: ["Empleados"],
+        operationId: "createEmpleado",
+        summary: "Create an employee",
+        description: "Creates and returns the new employee with status 201.",
+        body: { $ref: "CreateEmpleadoBody#" },
+        response: { 201: { $ref: "Empleado#" }, 400: { $ref: "Problem#" } },
       },
     },
     async (req, reply) => {
@@ -86,9 +91,17 @@ export const empleadosRoutes: FastifyPluginAsync = async (app) => {
     "/:id",
     {
       schema: {
-        params: empleadoIdParamsSchema,
-        body: updateEmpleadoBodySchema,
-        response: { 200: empleadoSchema, 400: problemSchema, 404: problemSchema },
+        tags: ["Empleados"],
+        operationId: "updateEmpleado",
+        summary: "Update an employee",
+        description: "Replaces all mutable fields of an employee. 404 if not found.",
+        params: { $ref: "EmpleadoIdParams#" },
+        body: { $ref: "UpdateEmpleadoBody#" },
+        response: {
+          200: { $ref: "Empleado#" },
+          400: { $ref: "Problem#" },
+          404: { $ref: "Problem#" },
+        },
       },
     },
     async (req) => {
@@ -108,8 +121,17 @@ export const empleadosRoutes: FastifyPluginAsync = async (app) => {
     "/:id",
     {
       schema: {
-        params: empleadoIdParamsSchema,
-        response: { 204: { type: "null" }, 404: problemSchema, 422: problemSchema },
+        tags: ["Empleados"],
+        operationId: "deleteEmpleado",
+        summary: "Delete an employee",
+        description:
+          "Deletes the employee. 204 on success, 404 if not found, 422 if the employee owns tasks (FK restrict).",
+        params: { $ref: "EmpleadoIdParams#" },
+        response: {
+          204: { type: "null" },
+          404: { $ref: "Problem#" },
+          422: { $ref: "Problem#" },
+        },
       },
     },
     async (req, reply) => {
@@ -122,10 +144,15 @@ export const empleadosRoutes: FastifyPluginAsync = async (app) => {
     "/:id/tareas",
     {
       schema: {
-        params: empleadoIdParamsSchema,
+        tags: ["Empleados"],
+        operationId: "listTareasForEmpleado",
+        summary: "List tasks for an employee",
+        description:
+          "Returns all tasks assigned to the employee. Empty array if none. 404 if the employee does not exist.",
+        params: { $ref: "EmpleadoIdParams#" },
         response: {
-          200: { type: "array", items: tareaSchema },
-          404: problemSchema,
+          200: { type: "array", items: { $ref: "Tarea#" } },
+          404: { $ref: "Problem#" },
         },
       },
     },

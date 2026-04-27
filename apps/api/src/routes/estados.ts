@@ -1,23 +1,17 @@
 import type { FastifyPluginAsync } from "fastify";
-
-import {
-  createEstadoBodySchema,
-  estadoIdParamsSchema,
-  estadoSchema,
-  updateEstadoBodySchema,
-  type CreateEstadoBody,
-  type EstadoIdParams,
-  type UpdateEstadoBody,
-} from "../schemas/estado.js";
-import { problemSchema } from "../schemas/problem.js";
+import type { CreateEstadoBody, EstadoIdParams, UpdateEstadoBody } from "../schemas/estado.js";
 
 export const estadosRoutes: FastifyPluginAsync = async (app) => {
   app.get(
     "/",
     {
       schema: {
+        tags: ["Estados"],
+        operationId: "listEstados",
+        summary: "List all statuses",
+        description: "Returns all status catalogue entries ordered by id ascending.",
         response: {
-          200: { type: "array", items: estadoSchema },
+          200: { type: "array", items: { $ref: "Estado#" } },
         },
       },
     },
@@ -28,8 +22,12 @@ export const estadosRoutes: FastifyPluginAsync = async (app) => {
     "/:id",
     {
       schema: {
-        params: estadoIdParamsSchema,
-        response: { 200: estadoSchema, 404: problemSchema },
+        tags: ["Estados"],
+        operationId: "getEstado",
+        summary: "Get a status by id",
+        description: "Returns a single status entry. 404 if not found.",
+        params: { $ref: "EstadoIdParams#" },
+        response: { 200: { $ref: "Estado#" }, 404: { $ref: "Problem#" } },
       },
     },
     async (req) => {
@@ -43,8 +41,16 @@ export const estadosRoutes: FastifyPluginAsync = async (app) => {
     "/",
     {
       schema: {
-        body: createEstadoBodySchema,
-        response: { 201: estadoSchema, 400: problemSchema, 409: problemSchema },
+        tags: ["Estados"],
+        operationId: "createEstado",
+        summary: "Create a status",
+        description: "Creates a new status entry. 409 if the name already exists.",
+        body: { $ref: "CreateEstadoBody#" },
+        response: {
+          201: { $ref: "Estado#" },
+          400: { $ref: "Problem#" },
+          409: { $ref: "Problem#" },
+        },
       },
     },
     async (req, reply) => {
@@ -64,9 +70,18 @@ export const estadosRoutes: FastifyPluginAsync = async (app) => {
     "/:id",
     {
       schema: {
-        params: estadoIdParamsSchema,
-        body: updateEstadoBodySchema,
-        response: { 200: estadoSchema, 400: problemSchema, 404: problemSchema, 409: problemSchema },
+        tags: ["Estados"],
+        operationId: "updateEstado",
+        summary: "Update a status",
+        description: "Replaces all mutable fields of a status entry. 404 if not found.",
+        params: { $ref: "EstadoIdParams#" },
+        body: { $ref: "UpdateEstadoBody#" },
+        response: {
+          200: { $ref: "Estado#" },
+          400: { $ref: "Problem#" },
+          404: { $ref: "Problem#" },
+          409: { $ref: "Problem#" },
+        },
       },
     },
     async (req) => {
@@ -85,8 +100,17 @@ export const estadosRoutes: FastifyPluginAsync = async (app) => {
     "/:id",
     {
       schema: {
-        params: estadoIdParamsSchema,
-        response: { 204: { type: "null" }, 404: problemSchema, 422: problemSchema },
+        tags: ["Estados"],
+        operationId: "deleteEstado",
+        summary: "Delete a status",
+        description:
+          "Deletes the status. 204 on success, 404 if not found, 422 if referenced by any task (FK restrict).",
+        params: { $ref: "EstadoIdParams#" },
+        response: {
+          204: { type: "null" },
+          404: { $ref: "Problem#" },
+          422: { $ref: "Problem#" },
+        },
       },
     },
     async (req, reply) => {

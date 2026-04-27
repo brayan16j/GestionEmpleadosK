@@ -4,6 +4,7 @@ import fastifySensible from "@fastify/sensible";
 import fastifyCors from "@fastify/cors";
 
 import { envJsonSchema } from "./config/env.js";
+import { registerOpenApi } from "./openapi.js";
 import { prisma } from "./db/client.js";
 import { problemErrorHandler } from "./errors/problem.js";
 import { empleadosRoutes } from "./routes/empleados.js";
@@ -48,20 +49,36 @@ export async function buildApp(opts: BuildAppOptions = {}): Promise<FastifyInsta
     credentials: true,
   });
 
+  await registerOpenApi(app);
+
   app.decorate("prisma", prisma);
 
   app.setErrorHandler(problemErrorHandler);
 
   app.addHook("onRoute", (routeOptions) => {
-    if (routeOptions.method === "HEAD" || routeOptions.method === "OPTIONS") return;
-    const schema = routeOptions.schema as { response?: Record<string, unknown> } | undefined;
+    const method = routeOptions.method;
+    if (method === "HEAD" || method === "OPTIONS") return;
+    // skip routes registered by swagger plugins
+    if (routeOptions.url.startsWith("/docs")) return;
+
+    const schema = routeOptions.schema as
+      | {
+          response?: Record<string, unknown>;
+          operationId?: string;
+        }
+      | undefined;
+
     const hasTwoXx =
       schema?.response &&
       Object.keys(schema.response).some((code) => /^2\d\d$/.test(code) || code === "2xx");
     if (!hasTwoXx) {
       throw new Error(
-        `Route ${String(routeOptions.method)} ${routeOptions.url} is missing a response[2xx] schema`,
+        `Route ${String(method)} ${routeOptions.url} is missing a response[2xx] schema`,
       );
+    }
+
+    if (!schema?.operationId) {
+      throw new Error(`Route ${String(method)} ${routeOptions.url} is missing an operationId`);
     }
   });
 

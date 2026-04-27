@@ -1,19 +1,11 @@
 import type { FastifyPluginAsync } from "fastify";
-
-import {
-  cambiarEstadoBodySchema,
-  categoriaParamsSchema,
-  createTareaBodySchema,
-  tareaIdParamsSchema,
-  tareaSchema,
-  updateTareaBodySchema,
-  type CambiarEstadoBody,
-  type CategoriaParams,
-  type CreateTareaBody,
-  type TareaIdParams,
-  type UpdateTareaBody,
+import type {
+  CambiarEstadoBody,
+  CategoriaParams,
+  CreateTareaBody,
+  TareaIdParams,
+  UpdateTareaBody,
 } from "../schemas/tarea.js";
-import { problemSchema } from "../schemas/problem.js";
 
 type TareaWithRelations = {
   id: number;
@@ -41,35 +33,18 @@ function serializeTareaWithRelations(row: TareaWithRelations) {
   };
 }
 
-type TareaPlain = {
-  id: number;
-  nombre: string;
-  fechaCreacion: Date;
-  fechaInicioTarea: Date;
-  fechaFinalizacion: Date;
-  idEmpleado: number;
-  idEstado: number;
-};
-
-function serializeTareaPlain(row: TareaPlain) {
-  return {
-    id: row.id,
-    nombre: row.nombre,
-    fechaCreacion: row.fechaCreacion.toISOString().slice(0, 10),
-    fechaInicioTarea: row.fechaInicioTarea.toISOString().slice(0, 10),
-    fechaFinalizacion: row.fechaFinalizacion.toISOString().slice(0, 10),
-    idEmpleado: row.idEmpleado,
-    idEstado: row.idEstado,
-  };
-}
-
 export const tareasRoutes: FastifyPluginAsync = async (app) => {
   app.get(
     "/",
     {
       schema: {
+        tags: ["Tareas"],
+        operationId: "listTareas",
+        summary: "List all tasks",
+        description:
+          "Returns all tasks ordered by id ascending. Each item includes the related employee name and status name.",
         response: {
-          200: { type: "array", items: tareaSchema },
+          200: { type: "array", items: { $ref: "Tarea#" } },
         },
       },
     },
@@ -86,9 +61,14 @@ export const tareasRoutes: FastifyPluginAsync = async (app) => {
     "/categoria/:categoria",
     {
       schema: {
-        params: categoriaParamsSchema,
+        tags: ["Tareas"],
+        operationId: "listTareasByCategoria",
+        summary: "List tasks by status category",
+        description:
+          "Returns tasks whose related status category matches the path parameter. Uses a parameterized query (no SQL injection risk).",
+        params: { $ref: "CategoriaParams#" },
         response: {
-          200: { type: "array", items: tareaSchema },
+          200: { type: "array", items: { $ref: "Tarea#" } },
         },
       },
     },
@@ -106,8 +86,13 @@ export const tareasRoutes: FastifyPluginAsync = async (app) => {
     "/:id",
     {
       schema: {
-        params: tareaIdParamsSchema,
-        response: { 200: tareaSchema, 404: problemSchema },
+        tags: ["Tareas"],
+        operationId: "getTarea",
+        summary: "Get a task by id",
+        description:
+          "Returns a single task with related employee and status names. 404 if not found.",
+        params: { $ref: "TareaIdParams#" },
+        response: { 200: { $ref: "Tarea#" }, 404: { $ref: "Problem#" } },
       },
     },
     async (req) => {
@@ -124,8 +109,18 @@ export const tareasRoutes: FastifyPluginAsync = async (app) => {
     "/",
     {
       schema: {
-        body: createTareaBodySchema,
-        response: { 201: tareaSchema, 400: problemSchema, 404: problemSchema, 422: problemSchema },
+        tags: ["Tareas"],
+        operationId: "createTarea",
+        summary: "Create a task",
+        description:
+          "Creates a new task. If estadoNombre is omitted, the task defaults to 'pendiente'. 404 if the referenced employee or status does not exist.",
+        body: { $ref: "CreateTareaBody#" },
+        response: {
+          201: { $ref: "Tarea#" },
+          400: { $ref: "Problem#" },
+          404: { $ref: "Problem#" },
+          422: { $ref: "Problem#" },
+        },
       },
     },
     async (req, reply) => {
@@ -153,9 +148,19 @@ export const tareasRoutes: FastifyPluginAsync = async (app) => {
     "/:id",
     {
       schema: {
-        params: tareaIdParamsSchema,
-        body: updateTareaBodySchema,
-        response: { 200: tareaSchema, 400: problemSchema, 404: problemSchema, 422: problemSchema },
+        tags: ["Tareas"],
+        operationId: "updateTarea",
+        summary: "Update a task",
+        description:
+          "Replaces all mutable fields of a task except status. Use PUT /:id/estado to change status. 404 if not found.",
+        params: { $ref: "TareaIdParams#" },
+        body: { $ref: "UpdateTareaBody#" },
+        response: {
+          200: { $ref: "Tarea#" },
+          400: { $ref: "Problem#" },
+          404: { $ref: "Problem#" },
+          422: { $ref: "Problem#" },
+        },
       },
     },
     async (req) => {
@@ -178,9 +183,18 @@ export const tareasRoutes: FastifyPluginAsync = async (app) => {
     "/:id/estado",
     {
       schema: {
-        params: tareaIdParamsSchema,
-        body: cambiarEstadoBodySchema,
-        response: { 200: tareaSchema, 400: problemSchema, 404: problemSchema },
+        tags: ["Tareas"],
+        operationId: "changeTareaEstado",
+        summary: "Change task status",
+        description:
+          "Transitions the task to a new status, validated against the current status's cambiosPermitidos list. 400 if the transition is not allowed.",
+        params: { $ref: "TareaIdParams#" },
+        body: { $ref: "CambiarEstadoBody#" },
+        response: {
+          200: { $ref: "Tarea#" },
+          400: { $ref: "Problem#" },
+          404: { $ref: "Problem#" },
+        },
       },
     },
     async (req) => {
@@ -217,8 +231,12 @@ export const tareasRoutes: FastifyPluginAsync = async (app) => {
     "/:id",
     {
       schema: {
-        params: tareaIdParamsSchema,
-        response: { 204: { type: "null" }, 404: problemSchema },
+        tags: ["Tareas"],
+        operationId: "deleteTarea",
+        summary: "Delete a task",
+        description: "Deletes the task. 204 on success, 404 if not found.",
+        params: { $ref: "TareaIdParams#" },
+        response: { 204: { type: "null" }, 404: { $ref: "Problem#" } },
       },
     },
     async (req, reply) => {
@@ -226,7 +244,4 @@ export const tareasRoutes: FastifyPluginAsync = async (app) => {
       reply.status(204).send();
     },
   );
-
-  // Silence the unused import warning for serializeTareaPlain if linting is strict.
-  void serializeTareaPlain;
 };

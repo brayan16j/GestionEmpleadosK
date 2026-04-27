@@ -7,6 +7,7 @@ export const envZ = z.object({
   HOST: z.string().default("0.0.0.0"),
   CORS_ORIGINS: z.string().default("http://localhost:5173"),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
+  OPENAPI_UI_ENABLED: z.coerce.boolean().default(true),
 });
 
 export type Env = z.infer<typeof envZ>;
