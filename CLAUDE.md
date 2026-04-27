@@ -132,6 +132,35 @@ The backend is a Fastify 5 app with AJV validation, Zod-generated JSON schemas, 
 
 **Port 4000 clash:** the legacy Express app in `legacy/` also defaults to port `4000`. They cannot run simultaneously; override `PORT` in `.env` (e.g. `PORT=4001`) if you need both up at the same time.
 
+### OpenAPI contract
+
+The API exposes its OpenAPI 3.1 document and Swagger UI (controlled by `OPENAPI_UI_ENABLED`, default `true`):
+
+- **Browse docs:** `http://localhost:4000/docs` (Swagger UI)
+- **Raw JSON:** `http://localhost:4000/docs/json`
+
+The contract is versionable via `packages/api-types/`:
+
+| Command            | What it does                                                              |
+| ------------------ | ------------------------------------------------------------------------- |
+| `pnpm api:openapi` | Boots the API (no DB needed) and writes `packages/api-types/openapi.json` |
+| `pnpm api:types`   | Runs `api:openapi` then rebuilds TypeScript types in `packages/api-types` |
+
+**When to run `pnpm api:types`:** any time you add or modify a route, a schema `$id`, an `operationId`, or a field in `apps/api/src/schemas/`. The API tests include a snapshot test that fails if the committed `openapi.json` is out of date.
+
+**No-drift rule:** `apps/api/test/openapi-snapshot.test.ts` compares `app.swagger()` against `packages/api-types/openapi.json`. If they differ, `pnpm test` fails with the message `Run 'pnpm api:types' to regenerate.`
+
+**Consuming types in `apps/web`:** every feature's `api.ts` imports from `@employeek/api-types`:
+
+```ts
+import type { Schema } from "@employeek/api-types";
+
+export type Empleado = Schema<"Empleado">;
+export const listEmpleados = () => http<Empleado[]>("GET", "/empleados");
+```
+
+Available helpers: `Schema<K>`, `RequestBody<P, M>`, `ResponseBody<P, M, S>`. Never define a plain `interface` that mirrors an API response — use `Schema<K>` instead.
+
 ## Web app
 
 The frontend is a Vite 5 SPA (`apps/web/`) with React 18, TypeScript strict, TanStack Query v5, React Hook Form + Zod v3, Tailwind CSS v3, and shadcn/ui primitives.
