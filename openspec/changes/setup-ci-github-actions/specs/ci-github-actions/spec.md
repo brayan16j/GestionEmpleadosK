@@ -83,7 +83,7 @@ The workflow SHALL define a job named `contract-drift` that runs `pnpm install -
 
 ### Requirement: `openspec-sync` job validates change artifacts
 
-The workflow SHALL define a job named `openspec-sync` that installs the `openspec` CLI (matching the version used locally), then runs `openspec validate` from the repo root. The job SHALL fail if any in-flight change in `openspec/changes/` has missing dependencies, malformed artifacts, or unsynced delta specs.
+The workflow SHALL define a job named `openspec-sync` that installs the OpenSpec CLI (`@fission-ai/openspec`, matching the version used locally) via `npx -y @fission-ai/openspec@<pinned>` and runs `openspec validate --changes` from the repo root. The job SHALL fail if any in-flight change in `openspec/changes/` has missing dependencies, malformed artifacts, or unsynced delta specs. The `--changes` flag is required because `openspec validate` without arguments exits non-zero with `Nothing to validate`.
 
 #### Scenario: Malformed change fails the job
 

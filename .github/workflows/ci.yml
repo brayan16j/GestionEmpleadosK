@@ -128,13 +128,18 @@ jobs:
       - name: Validate OpenSpec changes
         # --changes validates every in-flight change in openspec/changes/.
         # Without a flag the CLI reports "Nothing to validate" and exits 1.
-        run: npx -y openspec@1.3.1 validate --changes
+        run: npx -y @fission-ai/openspec@1.3.1 validate --changes
 
   commitlint:
     name: Commitlint (PR range)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    # `pnpm install` triggers apps/api's postinstall (`prisma generate`), which
+    # validates DATABASE_URL via prisma.config.ts. Same placeholder pattern as
+    # quality and contract-drift — never dialed.
+    env:
+      DATABASE_URL: postgresql://noop:noop@localhost:5432/noop?schema=public
     steps:
       - uses: actions/checkout@v4
         with:
