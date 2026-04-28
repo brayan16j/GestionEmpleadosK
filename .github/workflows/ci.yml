@@ -1,0 +1,132 @@
+# EmployeeK CI pipeline
+#
+# Five jobs run on every push to main and every pull_request targeting main:
+#   - quality        — format:check, lint, typecheck, build (no DB)
+#   - test           — Vitest across all workspaces, against a Postgres service container
+#   - contract-drift — `pnpm api:types` + git diff guard (no-drift gate from CH6)
+#   - openspec-sync  — `openspec validate` for in-flight changes
+#   - commitlint     — only on pull_request, validates Conventional Commits in the PR range
+#
+# Performance targets (informational, measure on first runs and update):
+#   Cold cache: ~6-8 min total wall-clock (jobs run in parallel)
+#   Warm cache: ~2-3 min total
+#
+# Action pinning: third-party actions reference `@v4` tags. SHAs are intentionally
+# not hardcoded yet — Dependabot (`.github/dependabot.yml`) is configured to keep them
+# fresh and a follow-up change will switch to SHA pins once the policy is automated.
+#
+# Permissions follow least-privilege: only `contents: read` is granted globally; jobs
+# that need more must declare it explicitly (none currently do).
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  quality:
+    name: Quality (format, lint, typecheck, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm build
+
+  test:
+    name: Test (Vitest + Postgres)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: employeek
+          POSTGRES_PASSWORD: employeek
+          POSTGRES_DB: employeek
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U employeek -d employeek"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://employeek:employeek@localhost:5432/employeek?schema=public
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Apply migrations
+        run: pnpm db:migrate:deploy
+      - name: Seed catalogue tables
+        run: pnpm db:seed
+      - name: Run all test suites
+        run: pnpm test
+
+  contract-drift:
+    name: Contract drift (api-types in sync)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Regenerate OpenAPI snapshot + types
+        run: pnpm api:types
+      - name: Verify packages/api-types/ has no diff
+        id: diff
+        run: git diff --exit-code packages/api-types/
+      - name: Drift detected — actionable hint
+        if: failure() && steps.diff.outcome == 'failure'
+        run: |
+          echo "::error::OpenAPI types are out of sync. Run 'pnpm api:types' locally and commit the result."
+          exit 1
+
+  openspec-sync:
+    name: OpenSpec sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      # Decision (task 7.2): use `npx -y openspec@<pinned>` instead of a global
+      # `npm i -g`. Pinning the exact version that developers run locally keeps
+      # CI reproducible without polluting the runner's global modules.
+      - name: Validate OpenSpec changes
+        run: npx -y openspec@1.3.1 validate
+
+  commitlint:
+    name: Commitlint (PR range)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history needed to walk the PR commit range.
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - name: Lint commits in PR range
+        run: npx commitlint --from origin/${{ github.base_ref }} --to HEAD --config commitlint.config.cjs
