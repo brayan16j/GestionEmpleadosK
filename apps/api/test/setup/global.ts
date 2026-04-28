@@ -6,7 +6,12 @@ import { PrismaPg } from "@prisma/adapter-pg";
 export async function setup(): Promise<void> {
   if (!process.env.NODE_ENV) process.env.NODE_ENV = "test";
 
-  process.loadEnvFile(path.resolve(import.meta.dirname, "..", "..", "..", "..", ".env"));
+  // In CI .env is absent and vars come from the runner environment — swallow ENOENT.
+  try {
+    process.loadEnvFile(path.resolve(import.meta.dirname, "..", "..", "..", "..", ".env"));
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+  }
 
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
   const prisma = new PrismaClient({ adapter });
