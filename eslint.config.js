@@ -6,7 +6,6 @@ export default [
       "**/node_modules/**",
       "**/dist/**",
       "**/.turbo/**",
-      "legacy/**",
       "openspec/**",
       ".husky/**",
       "pnpm-lock.yaml",

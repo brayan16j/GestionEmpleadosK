@@ -34,7 +34,6 @@ apps/
 packages/
   eslint-config/  shared ESLint flat config
   tsconfig/       shared TypeScript presets
-legacy/           original Express app (quarantine, do not modify)
 openspec/         change artifacts and living specifications
 infra/            infrastructure (docker, scripts)
 ```
@@ -55,7 +54,6 @@ infra/            infrastructure (docker, scripts)
 
 - Commits follow [Conventional Commits](https://www.conventionalcommits.org/); this is enforced by a commit-msg hook.
 - Changes larger than a small fix go through the OpenSpec workflow under `openspec/`. See [`CLAUDE.md`](./CLAUDE.md) for the full contract.
-- Never modify files under `legacy/` — they exist only until the legacy retirement change removes them.
 
 ## License
 

@@ -26,7 +26,6 @@ apps/
 packages/
   eslint-config/  # @employeek/eslint-config — shared flat config
   tsconfig/       # @employeek/tsconfig — shared TS presets
-legacy/           # QUARANTINE: original Express app, do not touch
 infra/            # docker, scripts (starts empty, filled in CH2)
 openspec/         # change artifacts + living specs
   changes/<name>/ # proposal / design / specs / tasks for in-flight work
@@ -131,8 +130,6 @@ The backend is a Fastify 5 app with AJV validation, Zod-generated JSON schemas, 
 `errors[]` is present only on validation failures (400). `traceId` equals Fastify's `req.id` — the same id that appears in the JSON logs, so you can correlate a failing response with its log line.
 
 **Prisma decorator rule:** routes read the client via `app.prisma`, decorated inside `buildApp()` from the singleton at `apps/api/src/db/client.ts`. Do not `import { prisma }` directly from a route module — the decorator keeps test overrides possible and avoids duplicate client instances under `tsx watch`.
-
-**Port 4000 clash:** the legacy Express app in `legacy/` also defaults to port `4000`. They cannot run simultaneously; override `PORT` in `.env` (e.g. `PORT=4001`) if you need both up at the same time.
 
 ### OpenAPI contract
 
@@ -253,11 +250,8 @@ Each change lives in `openspec/changes/<kebab-name>/` with:
 - `specs/<capability>/spec.md` — what (SHALL/WHEN/THEN requirements)
 - `tasks.md` — ordered implementation checklist
 
-## Quarantined code — do not modify
+## External reference material — do not modify
 
-Two directories are read-only reference material:
-
-- **`legacy/`** — the original Express + Sequelize app. Not wired into `pnpm-workspace.yaml` or Turbo. Removed in `retire-legacy-express-stack` once the Fastify API reaches parity. Read for reference; never refactor in place.
 - **`D:\Proyectos Konecta\FRONTK1\`** — the original React frontend (outside this repo). Serves as a reference for screens being ported to `apps/web`. Do not modify anything there.
 
 ## Stack details and gotchas
@@ -272,6 +266,5 @@ Two directories are read-only reference material:
 - For anything beyond a trivial fix, check `openspec list --json` first. If an active change covers the work, read its artifacts before touching code.
 - If the work does not match any active change, propose a new one with `/opsx:propose` before implementing.
 - Follow commit conventions. One commit per logical task; keep diffs scoped.
-- Never touch `legacy/`.
 - Never commit without explicit user consent unless the task being executed explicitly includes a commit step (as OpenSpec `tasks.md` entries do).
 - If tests exist, run them locally before reporting work as done.
