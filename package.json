@@ -16,6 +16,7 @@
     "test": "turbo run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "ci:local": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm build",
     "clean": "turbo run clean && rimraf node_modules .turbo",
     "db:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d",
     "db:down": "docker compose --env-file .env -f infra/docker-compose.yml down",
