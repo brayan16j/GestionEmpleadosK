@@ -4,8 +4,13 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Load env before importing buildApp (which triggers @fastify/env validation)
-process.loadEnvFile(resolve(__dirname, "..", "..", "..", ".env"));
+// Load env before importing buildApp. In CI .env is absent and vars come from
+// the runner environment instead — swallow ENOENT so the script still works there.
+try {
+  process.loadEnvFile(resolve(__dirname, "..", "..", "..", ".env"));
+} catch (err) {
+  if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+}
 
 // Import after env is loaded
 const { buildApp } = await import("../src/app.js");
