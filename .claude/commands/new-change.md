@@ -121,7 +121,7 @@ Summarize:
 
 ## Guardrails
 
-- Never modify `legacy/` or `openspec/changes/archive/`.
+- Never modify `openspec/changes/archive/`.
 - If the change name already exists in `openspec/changes/`, ask the user: continue it or pick a new name?
 - Keep artifact content consistent with what's in `CLAUDE.md` (stack, conventions, patterns).
 - Follow Conventional Commits for the scaffold commit — do not skip the commit-msg hook.

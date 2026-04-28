@@ -20,5 +20,5 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "exclude": ["node_modules", "dist", ".turbo", "legacy"]
+  "exclude": ["node_modules", "dist", ".turbo"]
 }
