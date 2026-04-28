@@ -87,7 +87,7 @@
 ## 15. Cierre
 
 - [x] 15.1 Marcar todas las tasks anteriores como completadas (`[x]`).
-- [ ] 15.2 Correr `/opsx:archive setup-ci-github-actions` para mover specs/proposal/design a `openspec/changes/archive/` y propagar deltas a `openspec/specs/`.
+- [x] 15.2 Correr `/opsx:archive setup-ci-github-actions` para mover specs/proposal/design a `openspec/changes/archive/` y propagar deltas a `openspec/specs/`.
 
 ## 16. Follow-ups identificados (para changes futuras)
 
