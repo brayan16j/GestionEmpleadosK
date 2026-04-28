@@ -3,7 +3,12 @@ import process from "node:process";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-process.loadEnvFile(path.resolve(import.meta.dirname, "..", "..", "..", "..", ".env"));
+// In CI .env is absent and vars come from the runner environment — swallow ENOENT.
+try {
+  process.loadEnvFile(path.resolve(import.meta.dirname, "..", "..", "..", "..", ".env"));
+} catch (err) {
+  if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+}
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not set. Copy .env.example to .env at the repo root.");

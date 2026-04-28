@@ -5,7 +5,7 @@
   "type": "module",
   "description": "EmployeeK monorepo — backend (Fastify) and frontend (Vite + React) managed with pnpm workspaces and Turborepo.",
   "engines": {
-    "node": ">=20.18.0 <21"
+    "node": ">=20.19.0 <21"
   },
   "packageManager": "pnpm@9.15.4",
   "scripts": {
@@ -16,6 +16,7 @@
     "test": "turbo run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "ci:local": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm build",
     "clean": "turbo run clean && rimraf node_modules .turbo",
     "db:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d",
     "db:down": "docker compose --env-file .env -f infra/docker-compose.yml down",

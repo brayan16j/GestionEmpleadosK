@@ -1,5 +1,7 @@
 # CLAUDE.md — EmployeeK monorepo
 
+[![CI](https://github.com/brayan16j/GestionEmpleadosK/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/brayan16j/GestionEmpleadosK/actions/workflows/ci.yml)
+
 This file is loaded automatically by Claude Code at the start of every session in this repository. It is the contract between the codebase and the AI assistant.
 
 ## What this repository is
@@ -212,6 +214,26 @@ Commits with non-conforming messages are **rejected**. No exceptions — use `--
 | `pre-push`   | `pnpm typecheck`                                       |
 
 If a hook fails, investigate the root cause — do not bypass with `--no-verify` unless you are fixing the hook itself in the next commit.
+
+## Continuous integration (GitHub Actions)
+
+CI runs on every `push` to `main` and every `pull_request` targeting `main`. Five jobs run in parallel; a merge into `main` requires all four non-conditional ones to pass.
+
+| Job              | What it runs                                                                                                | When                |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- | ------------------- |
+| `quality`        | `pnpm format:check && pnpm lint && pnpm typecheck && pnpm build` (no DB)                                    | always              |
+| `test`           | `pnpm db:migrate:deploy && pnpm db:seed && pnpm test` against a `postgres:16-alpine` service container      | always              |
+| `contract-drift` | `pnpm api:types` + `git diff --exit-code packages/api-types/` (fails if the OpenAPI snapshot/types drifted) | always              |
+| `openspec-sync`  | `npx -y openspec@<pinned> validate` (fails if any in-flight change is malformed)                            | always              |
+| `commitlint`     | `npx commitlint --from origin/<base> --to HEAD` (full Conventional Commits range check)                     | only `pull_request` |
+
+**Reproduce CI locally before pushing:** `pnpm ci:local` runs the exact same steps as the `quality` job (in the same order). If it fails locally, CI will fail too.
+
+**Caches:** `~/.pnpm-store` is keyed by the lockfile hash; `node_modules/.cache/turbo` is keyed by SHA with a prefix `restore-keys` fallback. Cold runs target ≤8 min; warm runs target ≤3 min.
+
+**Common setup is extracted** into a composite action at `.github/actions/setup/action.yml` — every job that needs `pnpm install` reuses it.
+
+**Branch protection (one-time, manual):** the four required status checks (`quality`, `test`, `contract-drift`, `openspec-sync`) must be configured in **GitHub → Settings → Branches → `main`**. `commitlint` is not in the required list because it only runs on `pull_request`. Without branch protection, CI is informational only — direct pushes can still land on `main` without a green run.
 
 ## OpenSpec workflow
 
