@@ -1,5 +1,7 @@
 # EmployeeK
 
+[![CI](https://github.com/brayan16j/GestionEmpleadosK/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/brayan16j/GestionEmpleadosK/actions/workflows/ci.yml)
+
 Full-stack employee and task management app.
 
 - **Backend:** Fastify + Prisma + PostgreSQL _(under construction)_
