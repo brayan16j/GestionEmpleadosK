@@ -60,31 +60,39 @@ Stakeholders: Brayan (autor único). No hay consumidores externos del legacy.
 - **Decisión:** la última tarea corre los dos comandos y verifica que ambos pasan. Si alguno rompe por culpa del borrado (cosa improbable), se identifica antes del PR.
 - **Alternativa considerada:** correr `pnpm dev` y verificar manualmente que el API arranca. Rechazada como redundante — `pnpm test` ya levanta `buildApp()` para los tests de integración, y `pnpm ci:local` cubre format/lint/typecheck/build.
 
-## Audit de paridad — 17 endpoints originales del legacy
+## Audit de paridad — 18 endpoints originales del legacy
 
-Mapeo del legacy hacia `apps/api/src/routes/`. Confirmar cada fila durante la fase apply (tarea 4.x) leyendo ambos archivos y marcándola como verificada.
+Mapeo verificado del legacy (`legacy/src/routes/*.js`) hacia `apps/api/src/routes/*.ts`. Verificación realizada el 2026-04-28 leyendo ambos lados.
 
-| # | Método | Path legacy | Controller legacy | Path Fastify | Route Fastify | Status |
-| - | ------ | ----------- | ----------------- | ------------ | ------------- | ------ |
-| 1 | GET | `/empleados` | `empleadosController.list` | `/empleados` | `apps/api/src/routes/empleados.ts` | pendiente verificar |
-| 2 | GET | `/empleados/:id` | `empleadosController.getById` | `/empleados/:id` | `apps/api/src/routes/empleados.ts` | pendiente verificar |
-| 3 | POST | `/empleados` | `empleadosController.create` | `/empleados` | `apps/api/src/routes/empleados.ts` | pendiente verificar |
-| 4 | PUT | `/empleados/:id` | `empleadosController.update` | `/empleados/:id` | `apps/api/src/routes/empleados.ts` | pendiente verificar |
-| 5 | DELETE | `/empleados/:id` | `empleadosController.delete` | `/empleados/:id` | `apps/api/src/routes/empleados.ts` | pendiente verificar |
-| 6 | GET | `/estados` | `estadoController.list` | `/estados` | `apps/api/src/routes/estados.ts` | pendiente verificar |
-| 7 | GET | `/estados/:id` | `estadoController.getById` | `/estados/:id` | `apps/api/src/routes/estados.ts` | pendiente verificar |
-| 8 | POST | `/estados` | `estadoController.create` | `/estados` | `apps/api/src/routes/estados.ts` | pendiente verificar |
-| 9 | PUT | `/estados/:id` | `estadoController.update` | `/estados/:id` | `apps/api/src/routes/estados.ts` | pendiente verificar |
-| 10 | DELETE | `/estados/:id` | `estadoController.delete` | `/estados/:id` | `apps/api/src/routes/estados.ts` | pendiente verificar |
-| 11 | GET | `/tareas` | `tareasController.list` | `/tareas` | `apps/api/src/routes/tareas.ts` | pendiente verificar |
-| 12 | GET | `/tareas/:id` | `tareasController.getById` | `/tareas/:id` | `apps/api/src/routes/tareas.ts` | pendiente verificar |
-| 13 | POST | `/tareas` | `tareasController.create` | `/tareas` | `apps/api/src/routes/tareas.ts` | pendiente verificar |
-| 14 | PUT | `/tareas/:id` | `tareasController.update` | `/tareas/:id` | `apps/api/src/routes/tareas.ts` | pendiente verificar |
-| 15 | DELETE | `/tareas/:id` | `tareasController.delete` | `/tareas/:id` | `apps/api/src/routes/tareas.ts` | pendiente verificar |
-| 16 | GET | `/tareas/empleado/:empleadoId` | `tareasController.listByEmpleado` | `/tareas/empleado/:empleadoId` (o equivalente) | `apps/api/src/routes/tareas.ts` | pendiente verificar |
-| 17 | PATCH | `/tareas/:id/estado` | `tareasController.changeEstado` | `/tareas/:id/estado` (o equivalente) | `apps/api/src/routes/tareas.ts` | pendiente verificar |
+| #   | Método | Path legacy                       | Handler legacy                       | Path Fastify                  | Operation Fastify        | Status      |
+| --- | ------ | --------------------------------- | ------------------------------------ | ----------------------------- | ------------------------ | ----------- |
+| 1   | GET    | `/empleados`                      | `empleadosController.getEmpleados`   | `/empleados`                  | `listEmpleados`          | ✅ paridad   |
+| 2   | GET    | `/empleados/:id`                  | `empleadosController.getEmpleado`    | `/empleados/:id`              | `getEmpleado`            | ✅ paridad   |
+| 3   | POST   | `/empleados`                      | `empleadosController.createEmpleado` | `/empleados`                  | `createEmpleado`         | ✅ paridad   |
+| 4   | PUT    | `/empleados/:id`                  | `empleadosController.updateEmpleado` | `/empleados/:id`              | `updateEmpleado`         | ✅ paridad   |
+| 5   | DELETE | `/empleados/:id`                  | `empleadosController.deleteEmpleado` | `/empleados/:id`              | `deleteEmpleado`         | ✅ paridad   |
+| 6   | GET    | `/empleados/:id/tareas`           | `empleadosController.getEmpleadoTareas` | `/empleados/:id/tareas`    | `listTareasForEmpleado`  | ✅ paridad   |
+| 7   | GET    | `/estado`                         | `estadoController.getEstados`        | `/estados`                    | `listEstados`            | ✅ paridad † |
+| 8   | GET    | `/estado/:id`                     | `estadoController.getEstado`         | `/estados/:id`                | `getEstado`              | ✅ paridad † |
+| 9   | POST   | `/estado`                         | `estadoController.createEstado`      | `/estados`                    | `createEstado`           | ✅ paridad † |
+| 10  | PUT    | `/estado/:id`                     | `estadoController.updateEstado`      | `/estados/:id`                | `updateEstado`           | ✅ paridad † |
+| 11  | DELETE | `/estado/:id`                     | `estadoController.deleteEstado`      | `/estados/:id`                | `deleteEstado`           | ✅ paridad † |
+| 12  | GET    | `/tareas`                         | `tareasController.getTareas`         | `/tareas`                     | `listTareas`             | ✅ paridad   |
+| 13  | GET    | `/tareas/categoria/:categoria`    | `tareasController.getTareasByCategoria` | `/tareas/categoria/:categoria` | `listTareasByCategoria` | ✅ paridad   |
+| 14  | POST   | `/tareas`                         | `tareasController.createTareas`      | `/tareas`                     | `createTarea`            | ✅ paridad   |
+| 15  | PUT    | `/tareas/:id`                     | `tareasController.updateTarea`       | `/tareas/:id`                 | `updateTarea`            | ✅ paridad   |
+| 16  | PUT    | `/tareas/:id/estado`              | `tareasController.cambiarEstadoTarea`| `/tareas/:id/estado`          | `changeTareaEstado`      | ✅ paridad   |
+| 17  | DELETE | `/tareas/:id`                     | `tareasController.deleteTarea`       | `/tareas/:id`                 | `deleteTarea`            | ✅ paridad   |
+| 18  | GET    | `/tareas/:id`                     | `tareasController.getTarea`          | `/tareas/:id`                 | `getTarea`               | ✅ paridad   |
 
-> **Nota:** los path exactos de los endpoints 16 y 17 (los "no-CRUD" sobre `tareas`) deben confirmarse leyendo ambos lados. Si un path difiere, se documenta como follow-up — no se modifica `apps/api` en esta change.
+**† Nota sobre `/estado` → `/estados`:** los 5 endpoints de la entidad usaban path singular en el legacy. El Fastify (consolidado durante el change 4) los expone con plural `/estados`. Es un rename de path **breaking**, pero ya está consolidado en specs canónicas (`api-rest`) y en el front (`apps/web`) — no se introduce aquí. La paridad funcional (CRUD completo de la entidad) está cumplida.
+
+**Endpoints adicionales en Fastify (sin equivalente en legacy):**
+
+- `GET /health` → `livenessCheck`
+- `GET /health/ready` → `readinessCheck`
+
+**Veredicto:** los 18 endpoints del legacy están todos cubiertos por `apps/api`. No hay endpoints sin portar. El borrado de `legacy/` es seguro.
 
 ## Risks / Trade-offs
 
