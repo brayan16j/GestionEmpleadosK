@@ -9,7 +9,9 @@
     "schemas": {
       "HealthResponse": {
         "type": "object",
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "properties": {
           "status": {
             "type": "string"
@@ -18,7 +20,13 @@
       },
       "Problem": {
         "type": "object",
-        "required": ["type", "title", "status", "instance", "traceId"],
+        "required": [
+          "type",
+          "title",
+          "status",
+          "instance",
+          "traceId"
+        ],
         "properties": {
           "type": {
             "type": "string",
@@ -45,7 +53,10 @@
             "type": "array",
             "items": {
               "type": "object",
-              "required": ["path", "message"],
+              "required": [
+                "path",
+                "message"
+              ],
               "properties": {
                 "path": {
                   "type": "string"
@@ -60,7 +71,14 @@
       },
       "Empleado": {
         "type": "object",
-        "required": ["id", "nombre", "fechaIngreso", "salario", "createdAt", "updatedAt"],
+        "required": [
+          "id",
+          "nombre",
+          "fechaIngreso",
+          "salario",
+          "createdAt",
+          "updatedAt"
+        ],
         "properties": {
           "id": {
             "type": "integer"
@@ -87,7 +105,11 @@
       },
       "CreateEmpleadoBody": {
         "type": "object",
-        "required": ["nombre", "fechaIngreso", "salario"],
+        "required": [
+          "nombre",
+          "fechaIngreso",
+          "salario"
+        ],
         "additionalProperties": false,
         "properties": {
           "nombre": {
@@ -107,7 +129,11 @@
       },
       "UpdateEmpleadoBody": {
         "type": "object",
-        "required": ["nombre", "fechaIngreso", "salario"],
+        "required": [
+          "nombre",
+          "fechaIngreso",
+          "salario"
+        ],
         "additionalProperties": false,
         "properties": {
           "nombre": {
@@ -127,7 +153,9 @@
       },
       "EmpleadoIdParams": {
         "type": "object",
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -137,7 +165,11 @@
       },
       "Estado": {
         "type": "object",
-        "required": ["id", "nombre", "categoria"],
+        "required": [
+          "id",
+          "nombre",
+          "categoria"
+        ],
         "properties": {
           "id": {
             "type": "integer"
@@ -149,13 +181,19 @@
             "type": "string"
           },
           "cambiosPermitidos": {
-            "type": ["null", "string"]
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
       "CreateEstadoBody": {
         "type": "object",
-        "required": ["nombre", "categoria"],
+        "required": [
+          "nombre",
+          "categoria"
+        ],
         "additionalProperties": false,
         "properties": {
           "nombre": {
@@ -169,13 +207,19 @@
             "maxLength": 100
           },
           "cambiosPermitidos": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
       "UpdateEstadoBody": {
         "type": "object",
-        "required": ["nombre", "categoria"],
+        "required": [
+          "nombre",
+          "categoria"
+        ],
         "additionalProperties": false,
         "properties": {
           "nombre": {
@@ -189,13 +233,18 @@
             "maxLength": 100
           },
           "cambiosPermitidos": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
       "EstadoIdParams": {
         "type": "object",
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -322,7 +371,9 @@
       },
       "CambiarEstadoBody": {
         "type": "object",
-        "required": ["idEstado"],
+        "required": [
+          "idEstado"
+        ],
         "additionalProperties": false,
         "properties": {
           "idEstado": {
@@ -333,7 +384,9 @@
       },
       "TareaIdParams": {
         "type": "object",
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "properties": {
           "id": {
             "type": "integer",
@@ -343,7 +396,9 @@
       },
       "CategoriaParams": {
         "type": "object",
-        "required": ["categoria"],
+        "required": [
+          "categoria"
+        ],
         "properties": {
           "categoria": {
             "type": "string",
@@ -359,7 +414,9 @@
       "get": {
         "operationId": "livenessCheck",
         "summary": "Liveness probe",
-        "tags": ["Health"],
+        "tags": [
+          "Health"
+        ],
         "description": "Always returns 200. Does not touch the database.",
         "responses": {
           "200": {
@@ -379,7 +436,9 @@
       "get": {
         "operationId": "readinessCheck",
         "summary": "Readiness probe",
-        "tags": ["Health"],
+        "tags": [
+          "Health"
+        ],
         "description": "Returns 200 when the database is reachable, 503 otherwise.",
         "responses": {
           "200": {
@@ -409,7 +468,9 @@
       "get": {
         "operationId": "listEmpleados",
         "summary": "List all employees",
-        "tags": ["Empleados"],
+        "tags": [
+          "Empleados"
+        ],
         "description": "Returns an array of all employees ordered by id ascending.",
         "responses": {
           "200": {
@@ -430,7 +491,9 @@
       "post": {
         "operationId": "createEmpleado",
         "summary": "Create an employee",
-        "tags": ["Empleados"],
+        "tags": [
+          "Empleados"
+        ],
         "description": "Creates and returns the new employee with status 201.",
         "requestBody": {
           "required": true,
@@ -470,7 +533,9 @@
       "get": {
         "operationId": "getEmpleado",
         "summary": "Get an employee by id",
-        "tags": ["Empleados"],
+        "tags": [
+          "Empleados"
+        ],
         "description": "Returns a single employee. 404 if not found.",
         "parameters": [
           {
@@ -509,7 +574,9 @@
       "put": {
         "operationId": "updateEmpleado",
         "summary": "Update an employee",
-        "tags": ["Empleados"],
+        "tags": [
+          "Empleados"
+        ],
         "description": "Replaces all mutable fields of an employee. 404 if not found.",
         "requestBody": {
           "required": true,
@@ -568,7 +635,9 @@
       "delete": {
         "operationId": "deleteEmpleado",
         "summary": "Delete an employee",
-        "tags": ["Empleados"],
+        "tags": [
+          "Empleados"
+        ],
         "description": "Deletes the employee. 204 on success, 404 if not found, 422 if the employee owns tasks (FK restrict).",
         "parameters": [
           {
@@ -612,7 +681,9 @@
       "get": {
         "operationId": "listTareasForEmpleado",
         "summary": "List tasks for an employee",
-        "tags": ["Empleados"],
+        "tags": [
+          "Empleados"
+        ],
         "description": "Returns all tasks assigned to the employee. Empty array if none. 404 if the employee does not exist.",
         "parameters": [
           {
@@ -656,7 +727,9 @@
       "get": {
         "operationId": "listEstados",
         "summary": "List all statuses",
-        "tags": ["Estados"],
+        "tags": [
+          "Estados"
+        ],
         "description": "Returns all status catalogue entries ordered by id ascending.",
         "responses": {
           "200": {
@@ -677,7 +750,9 @@
       "post": {
         "operationId": "createEstado",
         "summary": "Create a status",
-        "tags": ["Estados"],
+        "tags": [
+          "Estados"
+        ],
         "description": "Creates a new status entry. 409 if the name already exists.",
         "requestBody": {
           "required": true,
@@ -727,7 +802,9 @@
       "get": {
         "operationId": "getEstado",
         "summary": "Get a status by id",
-        "tags": ["Estados"],
+        "tags": [
+          "Estados"
+        ],
         "description": "Returns a single status entry. 404 if not found.",
         "parameters": [
           {
@@ -766,7 +843,9 @@
       "put": {
         "operationId": "updateEstado",
         "summary": "Update a status",
-        "tags": ["Estados"],
+        "tags": [
+          "Estados"
+        ],
         "description": "Replaces all mutable fields of a status entry. 404 if not found.",
         "requestBody": {
           "required": true,
@@ -835,7 +914,9 @@
       "delete": {
         "operationId": "deleteEstado",
         "summary": "Delete a status",
-        "tags": ["Estados"],
+        "tags": [
+          "Estados"
+        ],
         "description": "Deletes the status. 204 on success, 404 if not found, 422 if referenced by any task (FK restrict).",
         "parameters": [
           {
@@ -879,7 +960,9 @@
       "get": {
         "operationId": "listTareas",
         "summary": "List all tasks",
-        "tags": ["Tareas"],
+        "tags": [
+          "Tareas"
+        ],
         "description": "Returns all tasks ordered by id ascending. Each item includes the related employee name and status name.",
         "responses": {
           "200": {
@@ -900,7 +983,9 @@
       "post": {
         "operationId": "createTarea",
         "summary": "Create a task",
-        "tags": ["Tareas"],
+        "tags": [
+          "Tareas"
+        ],
         "description": "Creates a new task. If estadoNombre is omitted, the task defaults to 'pendiente'. 404 if the referenced employee or status does not exist.",
         "requestBody": {
           "required": true,
@@ -960,7 +1045,9 @@
       "get": {
         "operationId": "listTareasByCategoria",
         "summary": "List tasks by status category",
-        "tags": ["Tareas"],
+        "tags": [
+          "Tareas"
+        ],
         "description": "Returns tasks whose related status category matches the path parameter. Uses a parameterized query (no SQL injection risk).",
         "parameters": [
           {
@@ -995,7 +1082,9 @@
       "get": {
         "operationId": "getTarea",
         "summary": "Get a task by id",
-        "tags": ["Tareas"],
+        "tags": [
+          "Tareas"
+        ],
         "description": "Returns a single task with related employee and status names. 404 if not found.",
         "parameters": [
           {
@@ -1034,7 +1123,9 @@
       "put": {
         "operationId": "updateTarea",
         "summary": "Update a task",
-        "tags": ["Tareas"],
+        "tags": [
+          "Tareas"
+        ],
         "description": "Replaces all mutable fields of a task except status. Use PUT /:id/estado to change status. 404 if not found.",
         "requestBody": {
           "required": true,
@@ -1103,7 +1194,9 @@
       "delete": {
         "operationId": "deleteTarea",
         "summary": "Delete a task",
-        "tags": ["Tareas"],
+        "tags": [
+          "Tareas"
+        ],
         "description": "Deletes the task. 204 on success, 404 if not found.",
         "parameters": [
           {
@@ -1137,7 +1230,9 @@
       "put": {
         "operationId": "changeTareaEstado",
         "summary": "Change task status",
-        "tags": ["Tareas"],
+        "tags": [
+          "Tareas"
+        ],
         "description": "Transitions the task to a new status, validated against the current status's cambiosPermitidos list. 400 if the transition is not allowed.",
         "requestBody": {
           "required": true,
