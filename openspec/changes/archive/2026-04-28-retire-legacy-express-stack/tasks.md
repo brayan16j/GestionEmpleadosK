@@ -46,18 +46,18 @@
 
 ## 7. PR y merge
 
-- [ ] 7.1 Pushear la rama: `git push -u origin ch8/retire-legacy-express-stack`.
-- [ ] 7.2 Abrir PR contra `main` con `gh pr create`. Título: `chore: retire legacy Express+Sequelize stack`. Cuerpo: resumen de lo borrado, mencionar que es el cierre del plan ADR-0 (8/8), y que el audit de paridad se completó (link al `design.md` del change).
-- [ ] 7.3 Esperar que los 5 jobs CI corran verde sobre el PR (`quality`, `test`, `contract-drift`, `openspec-sync`, `commitlint`).
-- [ ] 7.4 Mergear el PR con squash o merge commit (la convención del repo en los 7 changes anteriores fue merge commit a través de la UI de GitHub).
+- [x] 7.1 Pushear la rama: `git push -u origin ch8/retire-legacy-express-stack`. _(Hecho por el usuario.)_
+- [x] 7.2 Abrir PR contra `main` con `gh pr create`. Título: `chore: retire legacy Express+Sequelize stack`. Cuerpo: resumen de lo borrado, mencionar que es el cierre del plan ADR-0 (8/8), y que el audit de paridad se completó (link al `design.md` del change). _(PR #12 abierto por el usuario.)_
+- [x] 7.3 Esperar que los 5 jobs CI corran verde sobre el PR (`quality`, `test`, `contract-drift`, `openspec-sync`, `commitlint`). _(5/5 jobs verdes.)_
+- [x] 7.4 Mergear el PR con squash o merge commit (la convención del repo en los 7 changes anteriores fue merge commit a través de la UI de GitHub). _(Merge commit `099a94d`.)_
 
 ## 8. Archivado y cierre
 
-- [ ] 8.1 Volver a `main` y `git pull --ff-only` para traer el merge.
-- [ ] 8.2 Marcar todas las tasks anteriores como `[x]`.
-- [ ] 8.3 Correr `/opsx:archive retire-legacy-express-stack` para mover el change a `openspec/changes/archive/2026-MM-DD-retire-legacy-express-stack/` y propagar el delta REMOVED a `openspec/specs/monorepo-foundation/spec.md`.
-- [ ] 8.4 Hacer commit y push del archive resultante (si el `/opsx:archive` deja working tree sucio).
-- [ ] 8.5 Actualizar la memoria del proyecto (`memory/project_employeek_refoundation.md`): marcar el plan ADR-0 como cerrado 8/8 y eliminar la cláusula "no tocar legacy/" de la sección _How to apply_.
+- [x] 8.1 Volver a `main` y `git pull --ff-only` para traer el merge. _(Fast-forwarded a `099a94d`.)_
+- [x] 8.2 Marcar todas las tasks anteriores como `[x]`.
+- [x] 8.3 Correr `/opsx:archive retire-legacy-express-stack` para mover el change a `openspec/changes/archive/2026-MM-DD-retire-legacy-express-stack/` y propagar el delta REMOVED a `openspec/specs/monorepo-foundation/spec.md`.
+- [x] 8.4 Hacer commit y push del archive resultante (si el `/opsx:archive` deja working tree sucio).
+- [x] 8.5 Actualizar la memoria del proyecto (`memory/project_employeek_refoundation.md`): marcar el plan ADR-0 como cerrado 8/8 y eliminar la cláusula "no tocar legacy/" de la sección _How to apply_.
 
 ## 9. Follow-ups identificados (para changes futuras)
 

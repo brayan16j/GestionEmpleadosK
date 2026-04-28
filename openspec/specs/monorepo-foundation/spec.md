@@ -125,24 +125,12 @@ The repository SHALL contain:
 - **WHEN** a developer runs `pnpm --filter @employeek/api build` and `pnpm --filter @employeek/web build`
 - **THEN** both skeletons emit `dist/` output without errors
 
-### Requirement: Legacy code quarantined under `legacy/`
-The repository SHALL move all pre-existing backend code (current `src/`, `models/`, `config/`, `package.json`, `package-lock.json`) into a top-level `legacy/` directory. This directory SHALL NOT be included in the pnpm workspace or in Turborepo pipelines, and SHALL remain runnable with `cd legacy && npm install && npm run dev` until it is retired in a later change.
-
-#### Scenario: Legacy still runs
-- **WHEN** a developer runs `cd legacy && npm install && npm run dev`
-- **THEN** the original Express server starts on port 4000 as before
-
-#### Scenario: Legacy is excluded from monorepo commands
-- **WHEN** a developer runs `pnpm lint`, `pnpm typecheck`, or `pnpm build` from the root
-- **THEN** no file under `legacy/` is processed
-
 ### Requirement: Developer documentation in `CLAUDE.md`
 The repository SHALL contain a `CLAUDE.md` at the root that documents:
 - the stack and tooling choices,
 - the full list of root scripts (`pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm format`),
 - Conventional Commit rules with examples,
-- the `openspec/` workflow (`/opsx:propose` → `/opsx:apply` → `/opsx:archive`),
-- a "do not touch `legacy/`" rule until the retirement change.
+- the `openspec/` workflow (`/opsx:propose` → `/opsx:apply` → `/opsx:archive`).
 
 #### Scenario: New contributor onboards
 - **WHEN** a new contributor opens the repo and reads `CLAUDE.md`
