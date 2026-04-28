@@ -22,6 +22,20 @@ The repo-root `package.json` SHALL declare a `packageManager` field with the exa
 
 ## MODIFIED Requirements
 
+### Requirement: Node version pinning
+
+The repository SHALL pin Node 20 LTS via a root `.nvmrc` file, and every `package.json` SHALL declare `engines.node >=20.19.0 <21`. The lower bound is `20.19.0` (not `20.18.0`) because Prisma 7 refuses to install on Node `<20.19.0` — running `pnpm install` on `20.18.x` fails the `prisma` `preinstall` script with `"Prisma only supports Node.js versions 20.19+, 22.12+, 24.0+"`.
+
+#### Scenario: Developer using the wrong Node version
+
+- **WHEN** a developer runs `pnpm install` on Node `20.18.x` or earlier
+- **THEN** the `prisma` `preinstall` script aborts with a Node-version error and `pnpm install` exits non-zero, guiding the developer to upgrade via `nvm use` (which reads `.nvmrc`)
+
+#### Scenario: CI provisions Node from `.nvmrc`
+
+- **WHEN** a CI job runs `actions/setup-node@v4` with `node-version-file: .nvmrc`
+- **THEN** the runner downloads the exact Node version listed in `.nvmrc` (`20.19.6` at the time of writing) and `pnpm install --frozen-lockfile` succeeds
+
 ### Requirement: Root scripts provide a unified developer interface
 
 The root `package.json` SHALL expose at least these scripts, each delegating to Turborepo or the appropriate tool:
