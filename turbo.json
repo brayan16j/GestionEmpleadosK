@@ -48,6 +48,10 @@
       "dependsOn": ["@employeek/api#openapi:dump"],
       "inputs": ["openapi.json", "src/**", "tsconfig.json", "package.json"],
       "outputs": ["dist/**", "src/generated.ts"]
+    },
+    "@employeek/api-types#typecheck": {
+      "dependsOn": ["@employeek/api-types#build"],
+      "outputs": ["*.tsbuildinfo", ".tsbuildinfo"]
     }
   }
 }
