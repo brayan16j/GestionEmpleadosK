@@ -1,5 +1,5 @@
 # Dependabot keeps third-party GitHub Actions and npm dependencies fresh.
-# Bumps land as PRs each Monday morning (UTC); a green CI run is required to merge.
+# Bumps land as PRs once a month (UTC); a green CI run is required to merge.
 #
 # Why both ecosystems here:
 #   - github-actions  → resolves `@v4` tags to a newer SHA when the upstream releases.
@@ -14,21 +14,17 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
     commit-message:
       prefix: chore(ci)
-    labels: [dependencies, github-actions]
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
     commit-message:
       prefix: chore(deps)
-    labels: [dependencies, npm]
     open-pull-requests-limit: 10
     versioning-strategy: increase-if-necessary
     ignore:
